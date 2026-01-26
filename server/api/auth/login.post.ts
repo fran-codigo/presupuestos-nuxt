@@ -7,19 +7,19 @@ export default eventHandler(async (event) => {
   const body = await readBody(event);
   const validatedData = loginSchema.parse(body);
 
-  const existingUser = await db
+  const user = await db
     .select()
     .from(usersTable)
     .where(eq(usersTable.email, validatedData.email));
 
-  if (existingUser.length === 0) {
+  if (user.length === 0) {
     throw createError({
       statusCode: 401,
       statusMessage: "Credenciales no válidas",
     });
   }
 
-  if (!existingUser[0]?.confirmed) {
+  if (!user[0]?.confirmed) {
     throw createError({
       statusCode: 401,
       statusMessage: "Cuenta no confirmada",
@@ -27,7 +27,7 @@ export default eventHandler(async (event) => {
   }
 
   const isPasswordValid = await verifyPassword(
-    existingUser[0].password,
+    user[0].password,
     validatedData.password,
   );
 
@@ -39,9 +39,9 @@ export default eventHandler(async (event) => {
   }
 
   await setUserSession(event, {
-    id: existingUser[0].id,
-    name: existingUser[0].name,
-    email: existingUser[0].email,
+    id: user[0].id,
+    name: user[0].name,
+    email: user[0].email,
   });
 
   return { success: true };
