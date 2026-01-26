@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
   if (existingUser.length === 0) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Credenciales no válidas 1",
+      statusMessage: "Credenciales no válidas",
     });
   }
 
@@ -34,7 +34,7 @@ export default eventHandler(async (event) => {
   if (!isPasswordValid) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Credenciales no válidas 2",
+      statusMessage: "Credenciales no válidas",
     });
   }
 

@@ -30,3 +30,10 @@ export const loginSchema = z.object({
     .email({ message: "El correo no es válido" }),
   password: z.string().min(1, { message: "La contraseña no puede ir vacia" }),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "El correo es obligatorio" })
+    .email({ message: "Correo no válido " }),
+});
