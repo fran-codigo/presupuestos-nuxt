@@ -22,3 +22,11 @@ export const registerSchema = z
 export const tokenSchema = z
   .string({ message: "Token no válido" })
   .length(6, { message: "Token no válido" });
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "El correo es Obligatorio" })
+    .email({ message: "El correo no es válido" }),
+  password: z.string().min(1, { message: "La contraseña no puede ir vacia" }),
+});
