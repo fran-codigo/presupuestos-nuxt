@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
   if (user.length === 0) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Bad Request",
+      statusMessage: "Not Found",
       message: "Usuario no encontrado",
     });
   }
@@ -24,7 +24,7 @@ export default eventHandler(async (event) => {
   if (!user[0]?.confirmed) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Bad Request",
+      statusMessage: "Unauthorized",
       message: "Cuenta no confirmada",
     });
   }
