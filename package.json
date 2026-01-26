@@ -1,0 +1,29 @@
+{
+  "name": "presupuestos",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "dotenv": "17.2.3",
+    "drizzle-orm": "0.45.1",
+    "mysql2": "3.16.1",
+    "nodemailer": "7.0.12",
+    "nuxt": "4.3.0",
+    "nuxt-auth-utils": "0.5.28",
+    "vue": "3.5.27",
+    "vue-router": "4.6.4",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "25.0.10",
+    "@types/nodemailer": "7.0.5",
+    "drizzle-kit": "0.31.8",
+    "tsx": "4.21.0"
+  }
+}
