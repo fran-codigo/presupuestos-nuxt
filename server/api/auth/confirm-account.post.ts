@@ -18,7 +18,8 @@ const {token } = await readBody(event);
     if (user.length === 0) {
         throw createError({
             statusCode: 400,
-            statusMessage: 'Token no válido',
+            statusMessage: 'Bad Request',
+            message: 'Token no válido'
         })
     }
 

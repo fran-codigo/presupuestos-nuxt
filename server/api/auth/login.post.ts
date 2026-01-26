@@ -15,14 +15,16 @@ export default eventHandler(async (event) => {
   if (user.length === 0) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Credenciales no válidas",
+      statusMessage: "Bad Request",
+      message: "Credenciales no válidas",
     });
   }
 
   if (!user[0]?.confirmed) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Cuenta no confirmada",
+      statusMessage: "Bad Request",
+      message: "Cuenta no confirmada",
     });
   }
 
@@ -34,7 +36,8 @@ export default eventHandler(async (event) => {
   if (!isPasswordValid) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Credenciales no válidas",
+      statusMessage: "Bad Request",
+      message: "Credenciales no válidas",
     });
   }
 

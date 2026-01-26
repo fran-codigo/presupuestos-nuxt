@@ -18,7 +18,8 @@ export default eventHandler(async (event) => {
     if (existingUser.length > 0) {
         throw createError({
             statusCode: 400,
-            statusMessage: 'El correo ya está registrado',
+            statusMessage: 'Bad Request',
+            message: 'El correo ya está registrado'
         });
     }
 
@@ -41,7 +42,8 @@ export default eventHandler(async (event) => {
     if(!user){
         throw createError({
             statusCode: 500,
-            statusMessage: 'Error al registrar el usuario',
+            statusMessage: 'Internal Server Error',
+            message: 'Error al registrar el usuario'
         });
     }
 
