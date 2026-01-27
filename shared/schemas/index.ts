@@ -64,3 +64,11 @@ export const updatePasswordSchema = z
     message: "Las contraseñas no son iguales",
     path: ["password_confirmation"],
   });
+
+  export const UpdateProfileSchema = z.object({
+  name: z.string().min(1, { message: "El nombre es obligatorio" }),
+  email: z
+    .string()
+    .min(1, { message: "El correo es obligatorio" })
+    .email({ message: "Correo no válido " }),
+});
