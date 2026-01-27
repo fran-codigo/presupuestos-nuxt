@@ -4,6 +4,7 @@ import { budgetsTable } from "~~/server/db/schema";
 
 export default eventHandler(async (event) => {
   const id = getRouterParam(event, "id");
+  const { user } = await requireUserSession(event);
 
   const budget = await db
     .select()
@@ -14,6 +15,16 @@ export default eventHandler(async (event) => {
     throw createError({
       statusCode: 404,
       statusMessage: "Not Found",
+      message: "Presupuesto no encontrado",
+    });
+  }
+
+  const budgetIsOwnedByUser = budget.some((b) => b.userId === user.id);
+
+  if (!budgetIsOwnedByUser) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
       message: "Presupuesto no encontrado",
     });
   }
