@@ -72,3 +72,8 @@ export const updatePasswordSchema = z
     .min(1, { message: "El correo es obligatorio" })
     .email({ message: "Correo no válido " }),
 });
+
+
+export const passwordValidationSchema = z
+  .string()
+  .min(1, { message: "La contraseña es obligatoria" });
