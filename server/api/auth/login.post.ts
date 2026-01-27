@@ -42,9 +42,11 @@ export default eventHandler(async (event) => {
   }
 
   await setUserSession(event, {
-    id: user[0].id,
-    name: user[0].name,
-    email: user[0].email,
+    user: {
+      id: user[0].id,
+      name: user[0].name,
+      email: user[0].email,
+    },
   });
 
   return { success: true };
