@@ -65,7 +65,7 @@ export const updatePasswordSchema = z
     path: ["password_confirmation"],
   });
 
-  export const UpdateProfileSchema = z.object({
+  export const updateProfileSchema = z.object({
   name: z.string().min(1, { message: "El nombre es obligatorio" }),
   email: z
     .string()

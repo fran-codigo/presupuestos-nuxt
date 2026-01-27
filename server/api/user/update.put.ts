@@ -1,37 +1,31 @@
 import { eq } from "drizzle-orm";
 import { db } from "~~/server/db";
 import { usersTable } from "~~/server/db/schema";
-import { updatePasswordSchema } from "~~/shared/schemas";
+import { updateProfileSchema } from "~~/shared/schemas";
 
 export default eventHandler(async (event) => {
   const body = await readBody(event);
-  const validatedData = updatePasswordSchema.parse(body);
+  const validatedData = updateProfileSchema.parse(body);
 
   const session = await requireUserSession(event);
 
   const user = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.id, session.user.id));
+    .where(eq(usersTable.email, validatedData.email));
 
-  const isPasswordCorrect = await verifyPassword(
-    user[0]!.password,
-    validatedData.current_password,
-  );
-
-  if (!isPasswordCorrect) {
+  if (user.length > 0 && user[0]!.id !== session.user.id) {
     throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-      message: "La contraseña actual es incorrecta",
+      statusCode: 409,
+      statusMessage: "Conflict",
+      message: "El correo ya está en uso, ingresa otro",
     });
   }
 
-  const hashedPassword = await hashPassword(validatedData.password);
   await db
     .update(usersTable)
-    .set({ password: hashedPassword })
+    .set({ name: validatedData.name, email: validatedData.email })
     .where(eq(usersTable.id, session.user.id));
 
-  return { message: "Contraseña actualizada correctamente" };
+  return { message: "Perfil actualizado correctamente" };
 });
