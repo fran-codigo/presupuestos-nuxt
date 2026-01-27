@@ -49,3 +49,18 @@ export const ResetPasswordSchema = z
     message: "Los contraseñas no son iguales",
     path: ["password_confirmation"],
   });
+
+export const updatePasswordSchema = z
+  .object({
+    current_password: z
+      .string()
+      .min(1, { message: "La contraseña es obligatoría" }),
+    password: z.string().min(8, {
+      message: "La nueva contraseña es muy corta, minimo 8 caracteres",
+    }),
+    password_confirmation: z.string(),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: "Las contraseñas no son iguales",
+    path: ["password_confirmation"],
+  });
