@@ -86,3 +86,10 @@ export const draftBudgetSchema = z.object({
     .number({ message: "Cantidad no válida" })
     .min(1, { message: "Cantidad no válida" }),
 });
+
+export const drafExpenseSchema = z.object({
+  name: z.string().min(1, { message: "El nombre del gasto es obligatorio" }),
+  amount: z.coerce
+    .number({ message: "Cantidad no válida" })
+    .min(1, { message: "Cantidad no válida" }),
+});
