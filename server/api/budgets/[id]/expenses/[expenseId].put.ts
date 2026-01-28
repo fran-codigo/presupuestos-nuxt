@@ -1,30 +1,13 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "~~/server/db";
 import { expensesTable } from "~~/server/db/schema";
+import { validateExpenseOwnership } from "~~/server/utils/expense";
 import { draftBudgetSchema } from "~~/shared/schemas";
 
 export default eventHandler(async (event) => {
-  const { budget } = await validateBudgetOwnership(event);
-  const expenseId = getRouterParam(event, "expenseId");
+  const { expense, budget } = await validateExpenseOwnership(event);
   const body = await readBody(event);
   const validatedData = draftBudgetSchema.parse(body);
-
-  const expense = await db
-    .select()
-    .from(expensesTable)
-    .where(
-      and(
-        eq(expensesTable.id, Number(expenseId)),
-        eq(expensesTable.budgetId, budget!.id),
-      ),
-    );
-
-  if (expense.length === 0) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "Gasto no encontrado",
-    });
-  }
 
   await db
     .update(expensesTable)
@@ -34,7 +17,7 @@ export default eventHandler(async (event) => {
     })
     .where(
       and(
-        eq(expensesTable.id, Number(expenseId)),
+        eq(expensesTable.id, Number(expense!.id)),
         eq(expensesTable.budgetId, budget!.id),
       ),
     );
