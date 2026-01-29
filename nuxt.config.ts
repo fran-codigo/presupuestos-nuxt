@@ -1,6 +1,11 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ['nuxt-auth-utils']
-})
+  css: ["./app/assets/css/main.css"],
+  modules: ["nuxt-auth-utils"],
+  vite: {
+    plugins: [tailwindcss()],
+  },
+});
