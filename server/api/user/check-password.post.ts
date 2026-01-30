@@ -4,9 +4,19 @@ import { usersTable } from "~~/server/db/schema";
 import { passwordValidationSchema } from "~~/shared/schemas";
 
 export default eventHandler(async (event) => {
-  const { password } = await readBody(event);
-  const validatedData = passwordValidationSchema.parse(password);
   const session = await requireUserSession(event);
+  const { password } = await readBody(event);
+  const validatedData = passwordValidationSchema.safeParse(password);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Contraseña inválida",
+      data: errors,
+    });
+  }
 
   const user = await db
     .select()
@@ -15,7 +25,7 @@ export default eventHandler(async (event) => {
 
   const isPasswordCorrect = await verifyPassword(
     user[0]!.password,
-    validatedData,
+    validatedData.data,
   );
 
   if (!isPasswordCorrect) {
