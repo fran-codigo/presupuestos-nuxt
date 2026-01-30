@@ -5,12 +5,22 @@ import { loginSchema } from "#shared/schemas";
 
 export default eventHandler(async (event) => {
   const body = await readBody(event);
-  const validatedData = loginSchema.parse(body);
+  const validatedData = loginSchema.safeParse(body);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Datos inválidos",
+      data: errors,
+    });
+  }
 
   const user = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.email, validatedData.email));
+    .where(eq(usersTable.email, validatedData.data.email));
 
   if (user.length === 0) {
     throw createError({
@@ -30,7 +40,7 @@ export default eventHandler(async (event) => {
 
   const isPasswordValid = await verifyPassword(
     user[0].password,
-    validatedData.password,
+    validatedData.data.password,
   );
 
   if (!isPasswordValid) {
