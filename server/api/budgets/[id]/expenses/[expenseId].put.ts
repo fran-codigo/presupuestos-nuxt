@@ -7,13 +7,23 @@ import { draftBudgetSchema } from "~~/shared/schemas";
 export default eventHandler(async (event) => {
   const { expense, budget } = await validateExpenseOwnership(event);
   const body = await readBody(event);
-  const validatedData = draftBudgetSchema.parse(body);
+  const validatedData = draftBudgetSchema.safeParse(body);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Datos de gasto inválidos",
+      data: errors,
+    });
+  }
 
   await db
     .update(expensesTable)
     .set({
-      name: validatedData.name,
-      amount: String(validatedData.amount),
+      name: validatedData.data.name,
+      amount: String(validatedData.data.amount),
     })
     .where(
       and(
