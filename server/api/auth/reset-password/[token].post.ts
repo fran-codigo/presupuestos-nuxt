@@ -8,7 +8,17 @@ export default eventHandler(async (event) => {
   const validatedToken = tokenSchema.parse(token);
 
   const body = await readBody(event);
-  const validatedData = ResetPasswordSchema.parse(body);
+  const validatedData = ResetPasswordSchema.safeParse(body);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Datos inválidos",
+      data: errors,
+    });
+  }
 
   const user = await db
     .select()
@@ -23,7 +33,7 @@ export default eventHandler(async (event) => {
     });
   }
 
-  const hashedPassword = await hashPassword(validatedData.password);
+  const hashedPassword = await hashPassword(validatedData.data.password);
 
   await db
     .update(usersTable)
