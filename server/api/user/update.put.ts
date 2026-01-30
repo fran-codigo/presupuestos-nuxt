@@ -4,15 +4,24 @@ import { usersTable } from "~~/server/db/schema";
 import { updateProfileSchema } from "~~/shared/schemas";
 
 export default eventHandler(async (event) => {
-  const body = await readBody(event);
-  const validatedData = updateProfileSchema.parse(body);
-
   const session = await requireUserSession(event);
+  const body = await readBody(event);
+  const validatedData = updateProfileSchema.safeParse(body);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Datos inválidos",
+      data: errors,
+    });
+  }
 
   const user = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.email, validatedData.email));
+    .where(eq(usersTable.email, validatedData.data.email));
 
   if (user.length > 0 && user[0]!.id !== session.user.id) {
     throw createError({
@@ -24,7 +33,7 @@ export default eventHandler(async (event) => {
 
   await db
     .update(usersTable)
-    .set({ name: validatedData.name, email: validatedData.email })
+    .set({ name: validatedData.data.name, email: validatedData.data.email })
     .where(eq(usersTable.id, session.user.id));
 
   return { message: "Perfil actualizado correctamente" };
