@@ -4,10 +4,19 @@ import { usersTable } from "~~/server/db/schema";
 import { updatePasswordSchema } from "~~/shared/schemas";
 
 export default eventHandler(async (event) => {
-  const body = await readBody(event);
-  const validatedData = updatePasswordSchema.parse(body);
-
   const session = await requireUserSession(event);
+  const body = await readBody(event);
+  const validatedData = updatePasswordSchema.safeParse(body);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Datos inválidos",
+      data: errors,
+    });
+  }
 
   const user = await db
     .select()
@@ -16,7 +25,7 @@ export default eventHandler(async (event) => {
 
   const isPasswordCorrect = await verifyPassword(
     user[0]!.password,
-    validatedData.current_password,
+    validatedData.data.current_password,
   );
 
   if (!isPasswordCorrect) {
@@ -27,7 +36,7 @@ export default eventHandler(async (event) => {
     });
   }
 
-  const hashedPassword = await hashPassword(validatedData.password);
+  const hashedPassword = await hashPassword(validatedData.data.password);
   await db
     .update(usersTable)
     .set({ password: hashedPassword })
