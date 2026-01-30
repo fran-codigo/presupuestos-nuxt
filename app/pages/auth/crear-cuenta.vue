@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FetchError } from "ofetch";
+const { handleErrors } = useHandleErrors();
 
 const toast = useToast();
 const data = reactive({
@@ -10,12 +10,10 @@ const data = reactive({
 });
 const loading = ref(false);
 const message = ref("");
-const errors = ref([]);
 
 const onSubmit = async () => {
   try {
     loading.value = true;
-    errors.value = [];
 
     const res = await $fetch("/api/auth/register", {
       method: "POST",
@@ -31,29 +29,7 @@ const onSubmit = async () => {
     data.password = "";
     data.password_confirmation = "";
   } catch (error) {
-    // console.log(error);
-    const fetchErr = error as FetchError;
-
-    if (fetchErr?.data?.data) {
-      const errorMessages = Array.isArray(fetchErr.data.data)
-        ? fetchErr.data.data
-        : [fetchErr.data.data];
-
-      errorMessages.forEach((error: string) => {
-        toast.error({
-          message: error,
-        });
-      });
-    }
-    else if (fetchErr?.data?.message) {
-      toast.error({
-        message: fetchErr.data.message,
-      });
-    } else {
-      toast.error({
-        message: "Hubo un error al crear la cuenta",
-      });
-    }
+    handleErrors(toast, error, "Hubo un error al crear la cuenta");
   } finally {
     loading.value = false;
   }
@@ -68,12 +44,6 @@ const onSubmit = async () => {
     </p>
 
     <form @submit.prevent="onSubmit" class="mt-14 space-y-5" noValidate>
-      <div v-if="errors.length > 0" class="my-4 rounded-lg p-4">
-        <p v-for="(error, index) in errors" :key="index" class="text-red-700">
-          {{ error }}
-        </p>
-      </div>
-
       <p
         v-if="message"
         class="my-4 text-green-800 font-bold text-center text-xl border border-green-300 p-1 rounded-lg"
