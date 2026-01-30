@@ -5,14 +5,26 @@ import { validateBudgetOwnership } from "~~/server/utils/budget";
 import { draftBudgetSchema } from "~~/shared/schemas";
 
 export default eventHandler(async (event) => {
-  const body = await readBody(event);
-  const validatedData = draftBudgetSchema.parse(body);
-
   const { budget } = await validateBudgetOwnership(event);
+  const body = await readBody(event);
+  const validatedData = draftBudgetSchema.safeParse(body);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Datos de presupuesto inválidos",
+      data: errors,
+    });
+  }
 
   await db
     .update(budgetsTable)
-    .set({ name: validatedData.name, amount: String(validatedData.amount) })
+    .set({
+      name: validatedData.data.name,
+      amount: String(validatedData.data.amount),
+    })
     .where(eq(budgetsTable.id, budget!.id));
 
   return { message: "Presupuesto actualizado correctamente" };
