@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { handleErrors } = useHandleErrors();
-
 const toast = useToast();
+
 const data = reactive({
   email: "",
   name: "",
