@@ -6,12 +6,22 @@ import { forgotPasswordSchema } from "~~/shared/schemas";
 
 export default eventHandler(async (event) => {
   const body = await readBody(event);
-  const validatedData = forgotPasswordSchema.parse(body);
+  const validatedData = forgotPasswordSchema.safeParse(body);
+
+  if (!validatedData.success) {
+    const errors = validatedData.error.issues.map((error) => error.message);
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Datos inválidos",
+      data: errors,
+    });
+  }
 
   const user = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.email, validatedData.email));
+    .where(eq(usersTable.email, validatedData.data.email));
 
   if (user.length === 0) {
     throw createError({
@@ -33,7 +43,7 @@ export default eventHandler(async (event) => {
   await db
     .update(usersTable)
     .set({ token: token })
-    .where(eq(usersTable.email, validatedData.email));
+    .where(eq(usersTable.email, validatedData.data.email));
 
   await sendPasswordResetToken({
     name: user[0].name,
