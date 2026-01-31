@@ -15,7 +15,7 @@
         <AppMenu />
       </div>
     </header>
-    <section class="max-w-5xl mx-auto mt-20 p-3 py-10">
+    <section class="max-w-5xl mx-auto mt-10 p-3 py-10">
       <slot />
     </section>
 
