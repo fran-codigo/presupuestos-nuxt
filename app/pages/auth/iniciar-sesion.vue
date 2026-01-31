@@ -1,11 +1,34 @@
 <script setup lang="ts">
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
+const { fetch } = useUserSession();
+const { handleErrors } = useHandleErrors();
+const toast = useToast();
+
+const loginData = reactive({
+  email: "",
+  password: "",
+});
+const loading = ref(false);
 
 const onSubmit = async () => {
+  try {
+    loading.value = true;
 
-}
+    const res = await $fetch("/api/auth/login", {
+      method: "POST",
+      body: loginData,
+    });
+
+    if (res) {
+      await fetch();
+      // TODO: Redirect to dashboard or home page
+      await navigateTo("/");
+    }
+  } catch (error) {
+    handleErrors(toast, error, "Hubo un error al iniciar sesión");
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -25,7 +48,7 @@ const onSubmit = async () => {
           placeholder="Email de Registro"
           class="w-full border border-gray-300 p-3 rounded-lg"
           name="email"
-          v-model="email"
+          v-model="loginData.email"
         />
       </div>
 
@@ -37,15 +60,17 @@ const onSubmit = async () => {
           placeholder="Password de Registro"
           class="w-full border border-gray-300 p-3 rounded-lg"
           name="password"
-          v-model="password"
+          v-model="loginData.password"
         />
       </div>
 
-      <input
+      <button
         type="submit"
-        value="Iniciar Sesión"
-        class="bg-green-900 hover:bg-green-800 w-full p-3 rounded-lg text-white font-black text-xl cursor-pointer"
-      />
+        :disabled="loading"
+        class="bg-green-900 hover:bg-green-800 w-full p-3 rounded-lg text-white font-black text-xl cursor-pointer disabled:opacity-50"
+      >
+        {{ loading ? "Iniciando Sesión..." : "Iniciar Sesión" }}
+      </button>
     </form>
 
     <nav class="mt-10 flex flex-col space-y-4">
