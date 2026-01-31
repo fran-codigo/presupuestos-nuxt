@@ -20,8 +20,7 @@ const onSubmit = async () => {
 
     if (res) {
       await fetch();
-      // TODO: Redirect to dashboard or home page
-      await navigateTo("/");
+      await navigateTo("/app");
     }
   } catch (error) {
     handleErrors(toast, error, "Hubo un error al iniciar sesión");
