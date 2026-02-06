@@ -38,7 +38,7 @@ async function handleDelete() {
   <div>
     <DropdownMenuRoot>
       <DropdownMenuTrigger
-        class="rounded-full w-[35px] h-[35px] inline-flex items-center justify-center text-gray-600 bg-white hover:bg-gray-100 outline-none focus:ring-2 focus:ring-gray-400"
+        class="rounded-full w-8.75 h-8.75 inline-flex items-center justify-center text-gray-600 bg-white hover:bg-gray-100 outline-none focus:ring-2 focus:ring-gray-400"
         aria-label="Abrir opciones"
       >
         <Icon icon="radix-icons:dots-vertical" class="w-5 h-5" />
@@ -46,7 +46,7 @@ async function handleDelete() {
 
       <DropdownMenuPortal>
         <DropdownMenuContent
-          class="min-w-[160px] bg-white rounded-md shadow-lg py-1 z-50"
+          class="min-w-40 bg-white rounded-md shadow-lg py-1 z-50"
           :side-offset="5"
         >
           <DropdownMenuItem asChild>
