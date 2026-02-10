@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const route = useRoute();
+const router = useRouter();
+
 const id = route.params.id;
 const { data: budget } = await useFetch(`/api/budgets/${id}`);
 
@@ -19,6 +21,16 @@ const percentage = computed(() => {
   if (!budget.value?.amount || +budget.value.amount === 0) return 0;
   return +((totalSpent.value / +budget.value.amount) * 100).toFixed(2);
 });
+
+const openAddExpenseModal = () => {
+  router.push({
+    query: {
+      ...route.query,
+      showModal: 'true',
+      addExpense: 'true',
+    },
+  });
+};
 </script>
 
 <template>
@@ -28,7 +40,9 @@ const percentage = computed(() => {
         {{ budget?.name }}
       </h2>
 
-      <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+      <button
+        @click="openAddExpenseModal"
+       class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
         + Agregar gasto
       </button>
     </div>
@@ -95,7 +109,7 @@ const percentage = computed(() => {
               </p>
             </div>
           </div>
-          <AppExpensesExpenseMenu expenseId="{expense.id}" />
+          <AppExpensesExpenseMenu :expenseId="expense.id" />
         </li>
       </ul>
       <p
@@ -105,5 +119,6 @@ const percentage = computed(() => {
         No hay gastos registrados para este presupuesto.
       </p>
     </div>
+    <UiModalContainer />
   </div>
 </template>

@@ -7,6 +7,33 @@ import {
   DropdownMenuRoot,
   DropdownMenuTrigger,
 } from 'radix-vue';
+
+defineProps<{
+  expenseId: number;
+}>();
+
+const route = useRoute();
+const router = useRouter();
+
+const openEditExpenseModal = (expenseId: number) => {
+  router.push({
+    query: {
+      ...route.query,
+      showModal: 'true',
+      editExpenseId: expenseId.toString(),
+    },
+  });
+};
+
+const openDeleteExpenseModal = (expenseId: number) => {
+  router.push({
+    query: {
+      ...route.query,
+      showModal: 'true',
+      deleteExpenseId: expenseId.toString(),
+    },
+  });
+};
 </script>
 
 <template>
@@ -28,28 +55,20 @@ import {
           :side-offset="5"
         >
           <DropdownMenuItem asChild>
-            <!-- <NuxtLink
-              :to="`/app/presupuestos/${props.budgetId}`"
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+            <button
+              @click="openEditExpenseModal(expenseId)"
+              class="block w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50"
             >
-              Ver presupuesto
-            </NuxtLink> -->
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <!-- <NuxtLink
-              :to="`/app/presupuestos/${props.budgetId}/editar`"
-              class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Editar Presupuesto
-            </NuxtLink> -->
+              Editar gasto
+            </button>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
             <button
+              @click="openDeleteExpenseModal(expenseId)"
               class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
             >
-              Eliminar presupuesto
+              Eliminar gasto
             </button>
           </DropdownMenuItem>
         </DropdownMenuContent>
