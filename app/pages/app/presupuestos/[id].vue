@@ -2,22 +2,74 @@
 const route = useRoute();
 const id = route.params.id;
 const { data: budget } = await useFetch(`/api/budgets/${id}`);
+
+const totalSpent = computed(() => {
+  if (!budget.value?.expenses) return 0;
+  return budget.value.expenses.reduce(
+    (total, expense) => +expense.amount + total,
+    0,
+  );
+});
+const totalAvailable = computed(() => {
+  if (!budget.value?.amount) return 0;
+  return +budget.value.amount - totalSpent.value;
+});
+
+const percentage = computed(() => {
+  if (!budget.value?.amount || +budget.value.amount === 0) return 0;
+  return +((totalSpent.value / +budget.value.amount) * 100).toFixed(2);
+});
 </script>
 
 <template>
   <div>
-    <h1 class="font-black text-4xl text-green-800 my-5">
-      Presupuesto: {{ budget?.name }}
-    </h1>
+    <div class="my-4 flex justify-between items-center">
+      <h2 class="font-black text-4xl text-green-800 my-5">
+        {{ budget?.name }}
+      </h2>
 
-    <p class="text-lg font-semibold">
-      Monto:
-      <span
-        v-if="budget?.amount"
-        class="text-green-600 font-bold"
-        >{{ formatCurrency(+budget.amount) }}</span
-      >
-    </p>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+        + Agregar gasto
+      </button>
+    </div>
+
+    <div class="flex justify-center items-center gap-8">
+      <UiCirculeProgress
+        v-if="budget?.amount && budget.expenses"
+        :percent="percentage"
+        :size=300
+        :borderWidth=30
+        fill-color="#3b82f6"
+        empty-color="#e1e1e1"
+      />
+
+      <div class="">
+        <p class="text-lg font-semibold">
+          Presupuesto:
+          <span
+            v-if="budget?.amount"
+            class="text-green-600 font-bold"
+            >{{ formatCurrency(+budget.amount) }}</span
+          >
+        </p>
+        <p class="text-lg font-semibold">
+          Disponible:
+          <span
+            v-if="budget?.amount"
+            class="text-green-600 font-bold"
+            >{{ formatCurrency(totalAvailable) }}</span
+          >
+        </p>
+        <p class="text-lg font-semibold">
+          Gastado:
+          <span
+            v-if="budget?.amount"
+            class="text-green-600 font-bold"
+            >{{ formatCurrency(totalSpent) }}</span
+          >
+        </p>
+      </div>
+    </div>
 
     <div>
       <h2 class="font-black text-4xl text-purple-950 mt-10">
