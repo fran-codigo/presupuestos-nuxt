@@ -17,5 +17,5 @@ export default eventHandler(async (event) => {
     expenses: results.map((r) => r.expenses).filter((e) => e !== null),
   };
 
-  return { budget: formattedBudget };
+  return formattedBudget;
 });

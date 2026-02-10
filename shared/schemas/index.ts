@@ -1,95 +1,113 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const registerSchema = z
   .object({
     email: z
       .string()
-      .min(1, { message: "El correo es obligatorio" })
-      .email({ message: "Correo no válido " }),
-    name: z.string().min(1, { message: "El nombre es obligatorio" }),
+      .min(1, { message: 'El correo es obligatorio' })
+      .email({ message: 'Correo no válido ' }),
+    name: z.string().min(1, { message: 'El nombre es obligatorio' }),
     password: z
       .string()
-      .min(8, { message: "La contraseña es muy corta, minimo 8 caracteres" }),
+      .min(8, { message: 'La contraseña es muy corta, minimo 8 caracteres' }),
     password_confirmation: z
       .string()
-      .min(8, { message: "La contraseña es muy corta, minimo 8 caracteres" }),
+      .min(8, { message: 'La contraseña es muy corta, minimo 8 caracteres' }),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    message: "Las contraseñas no son iguales",
-    path: ["password_confirmation"],
+    message: 'Las contraseñas no son iguales',
+    path: ['password_confirmation'],
   });
 
 export const tokenSchema = z
-  .string({ message: "Token no válido" })
-  .length(6, { message: "Token no válido" });
+  .string({ message: 'Token no válido' })
+  .length(6, { message: 'Token no válido' });
 
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, { message: "El correo es Obligatorio" })
-    .email({ message: "El correo no es válido" }),
-  password: z.string().min(1, { message: "La contraseña no puede ir vacia" }),
+    .min(1, { message: 'El correo es Obligatorio' })
+    .email({ message: 'El correo no es válido' }),
+  password: z.string().min(1, { message: 'La contraseña no puede ir vacia' }),
 });
 
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
-    .min(1, { message: "El correo es obligatorio" })
-    .email({ message: "Correo no válido " }),
+    .min(1, { message: 'El correo es obligatorio' })
+    .email({ message: 'Correo no válido ' }),
 });
 
 export const ResetPasswordSchema = z
   .object({
     password: z
       .string()
-      .min(8, { message: "La contraseña debe ser de al menos 8 caracteres" }),
+      .min(8, { message: 'La contraseña debe ser de al menos 8 caracteres' }),
     password_confirmation: z.string(),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    message: "Los contraseñas no son iguales",
-    path: ["password_confirmation"],
+    message: 'Los contraseñas no son iguales',
+    path: ['password_confirmation'],
   });
 
 export const updatePasswordSchema = z
   .object({
     current_password: z
       .string()
-      .min(1, { message: "La contraseña es obligatoría" }),
+      .min(1, { message: 'La contraseña es obligatoría' }),
     password: z.string().min(8, {
-      message: "La nueva contraseña es muy corta, minimo 8 caracteres",
+      message: 'La nueva contraseña es muy corta, minimo 8 caracteres',
     }),
     password_confirmation: z.string(),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    message: "Las contraseñas no son iguales",
-    path: ["password_confirmation"],
+    message: 'Las contraseñas no son iguales',
+    path: ['password_confirmation'],
   });
 
-  export const updateProfileSchema = z.object({
-  name: z.string().min(1, { message: "El nombre es obligatorio" }),
+export const updateProfileSchema = z.object({
+  name: z.string().min(1, { message: 'El nombre es obligatorio' }),
   email: z
     .string()
-    .min(1, { message: "El correo es obligatorio" })
-    .email({ message: "Correo no válido " }),
+    .min(1, { message: 'El correo es obligatorio' })
+    .email({ message: 'Correo no válido ' }),
 });
-
 
 export const passwordValidationSchema = z
   .string()
-  .min(1, { message: "La contraseña es obligatoria" });
+  .min(1, { message: 'La contraseña es obligatoria' });
 
 export const draftBudgetSchema = z.object({
   name: z
     .string()
-    .min(1, { message: "El Nombre del presupuesto es obligatorio" }),
+    .min(1, { message: 'El Nombre del presupuesto es obligatorio' }),
   amount: z.coerce
-    .number({ message: "Cantidad no válida" })
-    .min(1, { message: "Cantidad no válida" }),
+    .number({ message: 'Cantidad no válida' })
+    .min(1, { message: 'Cantidad no válida' }),
 });
 
 export const drafExpenseSchema = z.object({
-  name: z.string().min(1, { message: "El nombre del gasto es obligatorio" }),
+  name: z.string().min(1, { message: 'El nombre del gasto es obligatorio' }),
   amount: z.coerce
-    .number({ message: "Cantidad no válida" })
-    .min(1, { message: "Cantidad no válida" }),
+    .number({ message: 'Cantidad no válida' })
+    .min(1, { message: 'Cantidad no válida' }),
 });
+
+/* APIS */
+
+export const ExpenseAPIResponseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  amount: z.string(),
+  budgetId: z.number(),
+});
+
+export const BudgetAPIResponseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  amount: z.string(),
+  userId: z.number(),
+  expenses: z.array(ExpenseAPIResponseSchema),
+});
+
+export type Budget = z.infer<typeof BudgetAPIResponseSchema>;
