@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: budgets, refresh } = await useFetch("/api/budgets");
+const { data: budgets, refresh } = await useFetch('/api/budgets');
 </script>
 
 <template>
@@ -40,13 +40,12 @@ const { data: budgets, refresh } = await useFetch("/api/budgets");
         <div class="flex min-w-0 gap-x-4">
           <div class="min-w-0 flex-auto space-y-2">
             <p class="text-sm font-semibold leading-6 text-gray-900">
-              <!-- <Link
-                        href={`/app/presupuestos/${budget.id}`}
-                        class="cursor-pointer hover:underline text-2xl font-bold"
-                      >
-                        {budget.name}
-                      </Link> -->
-              {{ budget.name }}
+              <NuxtLink
+                :href="`/app/presupuestos/${budget.id}`"
+                class="cursor-pointer hover:underline text-2xl font-bold"
+              >
+                {{ budget.name }}
+              </NuxtLink>
             </p>
             <p class="text-xl font-bold text-blue-500">
               {{ formatCurrency(+budget.amount) }}
@@ -54,12 +53,18 @@ const { data: budgets, refresh } = await useFetch("/api/budgets");
           </div>
         </div>
         <div class="flex shrink-0 items-center gap-x-6">
-          <AppBudgetsBudgetMenu :budget-id="budget.id" @deleted="refresh" />
+          <AppBudgetsBudgetMenu
+            :budget-id="budget.id"
+            @deleted="refresh"
+          />
         </div>
       </li>
     </ul>
 
-    <p v-else class="text-center py-20">
+    <p
+      v-else
+      class="text-center py-20"
+    >
       No tienes presupuestos aún
       <NuxtLink
         href="/app/presupuestos/crear"
