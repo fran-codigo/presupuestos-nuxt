@@ -95,7 +95,7 @@ const percentage = computed(() => {
               </p>
             </div>
           </div>
-          <!-- <ExpenseMenu expenseId="{expense.id}" /> -->
+          <AppExpensesExpenseMenu expenseId="{expense.id}" />
         </li>
       </ul>
       <p
