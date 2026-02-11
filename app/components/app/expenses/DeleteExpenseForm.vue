@@ -1,36 +1,68 @@
 <script setup lang="ts">
+import { DialogTitle } from 'radix-vue';
+
 interface Props {
   closeModal: () => void;
 }
 
 const props = defineProps<Props>();
+const refreshBudget = inject<() => Promise<void>>('refreshBudget');
 
 const route = useRoute();
+const budgetId = route.params.id;
 const expenseId = computed(() => route.query.deleteExpenseId as string);
 
 const onDelete = async () => {
-  console.log('Eliminar gasto:', expenseId.value);
-  // Lógica para eliminar
-  props.closeModal();
+  try {
+    const res = await $fetch(
+      `/api/budgets/${budgetId}/expenses/${expenseId.value}`,
+      {
+        method: 'DELETE',
+      },
+    );
+
+    const toast = useToast();
+    toast.success({ message: res.message });
+
+    if (refreshBudget) {
+      await refreshBudget();
+    }
+
+    props.closeModal();
+  } catch (error) {
+    const toast = useToast();
+    toast.error({ message: 'Hubo un error al eliminar el gasto' });
+  }
 };
 </script>
 
 <template>
   <div>
-    <h2 class="text-2xl font-bold mb-4 text-red-600">Eliminar Gasto</h2>
-    <p class="mb-6">¿Estás seguro de que deseas eliminar este gasto? Esta acción no se puede deshacer.</p>
-    <div class="flex gap-2">
+    <DialogTitle as="h3" class="font-black text-4xl text-green-800 my-5">
+      Eliminar Gasto
+    </DialogTitle>
+    
+    <p class="text-xl font-bold">
+      Confirma para eliminar, 
+      <span class="text-blue-500">el gasto</span>
+    </p>
+    <p class="text-gray-600 text-sm">
+      (Un gasto eliminado no se puede recuperar)
+    </p>
+    
+    <div class="grid grid-cols-2 gap-5 mt-10">
       <button
-        @click="onDelete"
-        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-      >
-        Eliminar
-      </button>
-      <button
-        @click="closeModal"
-        class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+        @click="props.closeModal"
+        class="bg-blue-500 w-full p-3 text-white uppercase font-bold hover:bg-blue-600 cursor-pointer transition-colors"
       >
         Cancelar
+      </button>
+      <button
+        type="button"
+        @click="onDelete"
+        class="bg-red-500 w-full p-3 text-white uppercase font-bold hover:bg-red-600 cursor-pointer transition-colors"
+      >
+        Eliminar
       </button>
     </div>
   </div>
