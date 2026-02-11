@@ -4,11 +4,11 @@ const { handleErrors } = useHandleErrors();
 const toast = useToast();
 const route = useRoute();
 const budgetId = route.params.id;
+const loading = ref(false);
 const formData = reactive({
   name: '',
   amount: 0,
 });
-const loading = ref(false);
 const refreshBudget = inject<() => Promise<void>>('refreshBudget');
 
 interface Props {

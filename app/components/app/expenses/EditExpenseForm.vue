@@ -1,29 +1,63 @@
 <script setup lang="ts">
+import { DialogTitle } from 'radix-vue';
+const { handleErrors } = useHandleErrors();
+
 interface Props {
   closeModal: () => void;
 }
+const props = defineProps<Props>();
 
-defineProps<Props>();
-
+const toast = useToast();
 const route = useRoute();
+const budgetId = route.params.id;
 const expenseId = computed(() => route.query.editExpenseId as string);
+const loading = ref(false);
+const refreshBudget = inject<() => Promise<void>>('refreshBudget');
 
-// Aquí cargarías los datos del gasto
+const { data: expense } = await useFetch(
+  `/api/budgets/${budgetId}/expenses/${expenseId.value}`,
+);
+
 const formData = reactive({
-  name: 'Gasto a editar',
-  amount: 100,
+  name: expense.value?.name || '',
+  amount: expense.value?.amount || 0,
 });
 
 const onSubmit = async () => {
-  console.log('Editar gasto:', expenseId.value, formData);
-  // closeModal();
+  try {
+    loading.value = true;
+    const res = await $fetch(
+      `/api/budgets/${budgetId}/expenses/${expenseId.value}`,
+      {
+        method: 'PUT',
+        body: formData,
+      },
+    );
+
+    if (refreshBudget) {
+      await refreshBudget();
+    }
+
+    if (res && res.message) {
+      toast.success({ message: res.message });
+    }
+
+    props.closeModal();
+  } catch (error) {
+    handleErrors(toast, error, 'Hubo un error al actualizar el gasto');
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 
 <template>
   <div>
-    <h2 class="text-2xl font-bold mb-4">Editar Gasto</h2>
-    <form @submit.prevent="onSubmit" class="space-y-4">
+    <DialogTitle class="text-2xl font-bold mb-4">Actualizar Gasto</DialogTitle>
+    <form
+      @submit.prevent="onSubmit"
+      class="space-y-4"
+    >
       <div>
         <label class="block text-sm font-bold mb-2">Nombre</label>
         <input
@@ -40,12 +74,13 @@ const onSubmit = async () => {
           class="w-full p-3 border border-gray-200 rounded"
         />
       </div>
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-2">
         <button
           type="submit"
-          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          :disabled="loading"
+          class="bg-blue-500 text-white px-4 py-3 rounded hover:bg-blue-600"
         >
-          Actualizar
+          {{ loading ? 'Actualizando...' : 'Actualizar Gasto' }}
         </button>
         <button
           type="button"
