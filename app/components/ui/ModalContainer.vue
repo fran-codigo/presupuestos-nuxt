@@ -10,6 +10,7 @@ import {
 import AddExpenseForm from '../app/expenses/AddExpenseForm.vue';
 import EditExpenseForm from '../app/expenses/EditExpenseForm.vue';
 import DeleteExpenseForm from '../app/expenses/DeleteExpenseForm.vue';
+import DeleteBudgetModal from '../app/budgets/DeleteBudgetModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -19,6 +20,7 @@ const componentsMap = {
   AddExpense: AddExpenseForm,
   EditExpense: EditExpenseForm,
   DeleteExpense: DeleteExpenseForm,
+  DeleteBudget: DeleteBudgetModal,
 } as const;
 
 // Determinar si el modal debe mostrarse
@@ -29,6 +31,7 @@ const getComponentName = () => {
   if (route.query.addExpense) return 'AddExpense';
   if (route.query.editExpenseId) return 'EditExpense';
   if (route.query.deleteExpenseId) return 'DeleteExpense';
+  if (route.query.deleteBudget) return 'DeleteBudget';
   return null;
 };
 
@@ -47,6 +50,7 @@ const closeModal = () => {
   delete query.addExpense;
   delete query.editExpenseId;
   delete query.deleteExpenseId;
+  delete query.deleteBudget;
 
   router.replace({
     path: route.path,

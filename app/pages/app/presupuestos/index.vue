@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { data: budgets, refresh } = await useFetch('/api/budgets');
+
+provide('refreshBudgets', refresh);
 </script>
 
 <template>
@@ -73,5 +75,6 @@ const { data: budgets, refresh } = await useFetch('/api/budgets');
         comienza creando uno
       </NuxtLink>
     </p>
+    <UiModalContainer />
   </div>
 </template>

@@ -8,20 +8,21 @@ import {
   DropdownMenuTrigger,
 } from 'radix-vue';
 
-const props = defineProps<{ budgetId: string | number }>();
-const emit = defineEmits<{ deleted: [] }>();
+defineProps<{
+  budgetId: number;
+}>();
+const route = useRoute();
+const router = useRouter();
 
-async function handleDelete() {
-  if (!confirm('¿Eliminar presupuesto? Esta acción no se puede deshacer.'))
-    return;
-  try {
-    await $fetch(`/api/budgets/${props.budgetId}`, { method: 'DELETE' });
-    emit('deleted');
-  } catch (err) {
-    console.error(err);
-    alert('Error eliminando presupuesto');
-  }
-}
+const openDeleteBudgetModal = (budgetId: number) => {
+  router.push({
+    query: {
+      ...route.query,
+      showModal: 'true',
+      deleteBudget: budgetId.toString(),
+    },
+  });
+};
 </script>
 
 <template>
@@ -44,7 +45,7 @@ async function handleDelete() {
         >
           <DropdownMenuItem asChild>
             <NuxtLink
-              :to="`/app/presupuestos/${props.budgetId}`"
+              :to="`/app/presupuestos/${budgetId}`"
               class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
             >
               Ver presupuesto
@@ -53,7 +54,7 @@ async function handleDelete() {
 
           <DropdownMenuItem asChild>
             <NuxtLink
-              :to="`/app/presupuestos/${props.budgetId}/editar`"
+              :to="`/app/presupuestos/${budgetId}/editar`"
               class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Editar Presupuesto
@@ -63,7 +64,7 @@ async function handleDelete() {
           <DropdownMenuItem asChild>
             <button
               class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-              @click.prevent="handleDelete"
+              @click.prevent="openDeleteBudgetModal(budgetId)"
             >
               Eliminar presupuesto
             </button>
