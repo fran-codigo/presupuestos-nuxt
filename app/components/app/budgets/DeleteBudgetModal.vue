@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { DialogTitle } from 'radix-vue';
 const { handleErrors } = useHandleErrors();
 const toast = useToast();
 const route = useRoute();
@@ -45,15 +46,23 @@ const onSubmit = async () => {
 
 <template>
   <div>
-    <div
-      class="relative bg-white rounded-lg shadow-lg w-full max-w-lg p-6 z-10"
-    >
-      <h3 class="text-2xl font-bold mb-2">Eliminar Presupuesto</h3>
-      <p class="text-sm text-gray-600 mb-4">
-        Para confirmar la eliminación, ingresa tu contraseña.
+    <div class="relative bg-white rounded-lg shadow-lg w-full p-6 z-10">
+      <DialogTitle
+        as="h3"
+        class="font-black text-4xl text-green-800 my-5"
+      >
+        Eliminar Presupuesto
+      </DialogTitle>
+
+      <p class="text-xl font-bold">
+        Confirma para eliminar,
+        <span class="text-blue-500"> el presupuesto</span>
+      </p>
+      <p class="text-gray-600 text-sm">
+        (Un presupuesto eliminado no se puede recuperar)
       </p>
 
-      <div class="space-y-4">
+      <div class="space-y-4 mt-6">
         <div>
           <label class="block text-sm font-medium mb-1">Contraseña</label>
           <input
@@ -64,21 +73,20 @@ const onSubmit = async () => {
           />
         </div>
 
-        <div class="flex gap-3 justify-end mt-4">
+        <div class="grid grid-cols-2 gap-5 mt-6">
           <button
-            type="button"
-            @click="closeModal"
-            class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+            @click="props.closeModal"
+            class="bg-blue-500 w-full p-3 text-white uppercase font-bold hover:bg-blue-600 cursor-pointer transition-colors"
           >
             Cancelar
           </button>
 
           <button
             type="button"
-            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-60"
             @click="onSubmit"
+            class="bg-red-500 w-full p-3 text-white uppercase font-bold hover:bg-red-600 cursor-pointer transition-colors"
           >
-            Confirmar Eliminación
+            Eliminar
           </button>
         </div>
       </div>
