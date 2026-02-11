@@ -88,7 +88,7 @@ const openAddExpenseModal = () => {
     </div>
 
     <div>
-      <h2 class="font-black text-4xl text-purple-950 mt-10">
+      <h2 class="font-black text-4xl text-blue-700 mt-10">
         Gastos en este presupuesto
       </h2>
       <ul
@@ -99,14 +99,14 @@ const openAddExpenseModal = () => {
         <li
           v-for="expense in budget.expenses"
           :key="expense.id"
-          class="flex justify-between gap-x-6 p-5"
+          class="flex justify-between items-center gap-x-6 p-5"
         >
           <div class="flex min-w-0 gap-x-4">
             <div class="min-w-0 flex-auto space-y-2">
               <p class="text-2xl font-semibold text-gray-900">
                 {{ expense.name }}
               </p>
-              <p class="text-xl font-bold text-amber-500">
+              <p class="text-xl font-bold text-green-700">
                 {{ formatCurrency(+expense.amount) }}
               </p>
             </div>
