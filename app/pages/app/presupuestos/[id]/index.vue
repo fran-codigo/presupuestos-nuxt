@@ -3,7 +3,13 @@ const route = useRoute();
 const router = useRouter();
 
 const id = route.params.id;
-const { data: budget, refresh } = await useFetch(`/api/budgets/${id}`);
+const { data: budget,error, refresh } = await useFetch(`/api/budgets/${id}`);
+
+if (error.value) {
+  const toast = useToast();
+  toast.error({ message: 'Hubo un error al cargar el presupuesto' });
+  await navigateTo('/app/presupuestos');
+}
 
 provide('refreshBudget', refresh);
 

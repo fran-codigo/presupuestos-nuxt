@@ -16,6 +16,11 @@ const refreshBudget = inject<() => Promise<void>>('refreshBudget');
 
 const { data: expense } = await useFetch(
   `/api/budgets/${budgetId}/expenses/${expenseId.value}`,
+  {
+    onResponseError() {
+      props.closeModal();
+    },
+  },
 );
 
 const formData = reactive({
@@ -44,6 +49,7 @@ const onSubmit = async () => {
 
     props.closeModal();
   } catch (error) {
+    props.closeModal();
     handleErrors(toast, error, 'Hubo un error al actualizar el gasto');
   } finally {
     loading.value = false;
