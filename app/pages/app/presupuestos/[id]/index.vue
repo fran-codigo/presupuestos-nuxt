@@ -3,7 +3,9 @@ const route = useRoute();
 const router = useRouter();
 
 const id = route.params.id;
-const { data: budget } = await useFetch(`/api/budgets/${id}`);
+const { data: budget, refresh } = await useFetch(`/api/budgets/${id}`);
+
+provide('refreshBudget', refresh);
 
 const totalSpent = computed(() => {
   if (!budget.value?.expenses) return 0;
