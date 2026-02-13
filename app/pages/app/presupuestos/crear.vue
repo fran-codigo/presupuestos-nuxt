@@ -39,7 +39,7 @@ const onSubmit = async () => {
       className="flex flex-col-reverse md:flex-row md:justify-between items-center"
     >
       <div className="w-full md:w-auto">
-        <h1 className="font-black text-4xl text-purple-950 my-5">
+        <h1 className="font-black text-4xl text-green-800 my-5">
           Nuevo Presupuesto
         </h1>
         <p className="text-xl font-bold">
