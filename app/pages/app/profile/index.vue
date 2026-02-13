@@ -47,52 +47,7 @@ import { TabsContent, TabsIndicator, TabsList, TabsRoot, TabsTrigger } from 'rad
         <p class="mb-6 text-gray-700 text-[15px] leading-relaxed">
           Cambia tu contraseña. Después de guardar, tendrás que iniciar sesión nuevamente.
         </p>
-        <fieldset class="mb-5 w-full flex flex-col justify-start">
-          <label
-            class="text-sm font-semibold mb-2 text-gray-800 block"
-            for="currentPassword"
-          >
-            Contraseña Actual
-          </label>
-          <input
-            id="currentPassword"
-            class="grow shrink-0 rounded px-3 py-2 text-[15px] leading-none text-gray-900 border border-gray-300 h-10 focus:border-blue-500 focus:shadow-[0_0_0_2px] focus:shadow-blue-100 outline-none transition-all"
-            type="password"
-          >
-        </fieldset>
-        <fieldset class="mb-5 w-full flex flex-col justify-start">
-          <label
-            class="text-sm font-semibold mb-2 text-gray-800 block"
-            for="newPassword"
-          >
-            Nueva Contraseña
-          </label>
-          <input
-            id="newPassword"
-            class="grow shrink-0 rounded px-3 py-2 text-[15px] leading-none text-gray-900 border border-gray-300 h-10 focus:border-blue-500 focus:shadow-[0_0_0_2px] focus:shadow-blue-100 outline-none transition-all"
-            type="password"
-          >
-        </fieldset>
-        <fieldset class="mb-5 w-full flex flex-col justify-start">
-          <label
-            class="text-sm font-semibold mb-2 text-gray-800 block"
-            for="confirmPassword"
-          >
-            Confirmar Contraseña
-          </label>
-          <input
-            id="confirmPassword"
-            class="grow shrink-0 rounded px-3 py-2 text-[15px] leading-none text-gray-900 border border-gray-300 h-10 focus:border-blue-500 focus:shadow-[0_0_0_2px] focus:shadow-blue-100 outline-none transition-all"
-            type="password"
-          >
-        </fieldset>
-        <div class="flex justify-end mt-8">
-          <button
-            class="inline-flex items-center justify-center rounded px-6 py-2 text-[15px] leading-none font-semibold h-10 bg-blue-600 text-white hover:bg-blue-700 focus:shadow-[0_0_0_2px] focus:shadow-blue-300 outline-none cursor-default transition-colors"
-          >
-            Cambiar contraseña
-          </button>
-        </div>
+        <AppProfileUpdatePasswordForm/>
       </TabsContent>
     </TabsRoot>
   </div>
