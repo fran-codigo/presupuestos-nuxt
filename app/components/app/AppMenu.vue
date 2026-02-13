@@ -54,6 +54,13 @@ const logout = async () => {
         Hola : {{ user?.name }}
       </p>
       <NuxtLink
+        href="/app/perfil"
+        @click.prevent="closeMenu"
+        class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+      >
+        Mi perfil
+      </NuxtLink>
+      <NuxtLink
         href="/app/presupuestos"
         @click.prevent="closeMenu"
         class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
