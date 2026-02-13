@@ -30,6 +30,16 @@ const percentage = computed(() => {
   return +((totalSpent.value / +budget.value.amount) * 100).toFixed(2);
 });
 
+const progressColor = computed(() => {
+  if (percentage.value <= 30) {
+    return '#3b82f6';
+  } else if (percentage.value <= 80) {
+    return '#f59e0b';
+  } else {
+    return '#ef4444';
+  }
+});
+
 const openAddExpenseModal = () => {
   router.push({
     query: {
@@ -61,7 +71,7 @@ const openAddExpenseModal = () => {
         :percent="percentage"
         :size=300
         :borderWidth=30
-        fill-color="#3b82f6"
+        :fill-color="progressColor"
         empty-color="#e1e1e1"
       />
 
