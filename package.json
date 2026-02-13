@@ -11,6 +11,7 @@
     "db:seed": "tsx ./server/db/seed.ts"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "@tailwindcss/vite": "4.1.18",
     "dotenv": "17.2.3",
     "drizzle-orm": "0.45.1",
@@ -29,6 +30,7 @@
     "@iconify/vue": "^5.0.0",
     "@types/node": "25.0.10",
     "@types/nodemailer": "7.0.5",
+    "@types/pg": "^8.16.0",
     "drizzle-kit": "0.31.8",
     "tsx": "4.21.0"
   },

@@ -1,14 +1,23 @@
+// import {
+//   decimal,
+//   int,
+//   mysqlTable,
+//   varchar,
+//   boolean,
+//   timestamp,
+// } from "drizzle-orm/mysql-core";
+
 import {
   decimal,
-  int,
-  mysqlTable,
+  integer,
+  pgTable,
   varchar,
   boolean,
   timestamp,
-} from "drizzle-orm/mysql-core";
+} from 'drizzle-orm/pg-core';
 
-export const usersTable = mysqlTable("users", {
-  id: int().autoincrement().primaryKey(),
+export const usersTable = pgTable('users', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
   email: varchar({ length: 100 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
@@ -16,16 +25,20 @@ export const usersTable = mysqlTable("users", {
   confirmed: boolean().default(false).notNull(),
 });
 
-export const budgetsTable = mysqlTable("budgets", {
-  id: int().primaryKey().autoincrement(),
-  userId: int().notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+export const budgetsTable = pgTable('budgets', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  userId: integer()
+    .notNull()
+    .references(() => usersTable.id, { onDelete: 'cascade' }),
   name: varchar({ length: 100 }).notNull(),
   amount: decimal().notNull(),
 });
 
-export const expensesTable = mysqlTable("expenses", {
-  id: int().primaryKey().autoincrement(),
-  budgetId: int().notNull().references(() => budgetsTable.id, { onDelete: "cascade" }),
+export const expensesTable = pgTable('expenses', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  budgetId: integer()
+    .notNull()
+    .references(() => budgetsTable.id, { onDelete: 'cascade' }),
   name: varchar({ length: 100 }).notNull(),
   amount: decimal().notNull(),
   date: timestamp().defaultNow().notNull(),
