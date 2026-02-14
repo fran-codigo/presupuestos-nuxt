@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
-:root {
+/* :root {
   --ui-bg: var(--ui-color-neutral-50);
-}
+} */
