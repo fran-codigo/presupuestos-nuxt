@@ -14,6 +14,7 @@ import {
   varchar,
   boolean,
   timestamp,
+  text,
 } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable('users', {
@@ -42,4 +43,16 @@ export const expensesTable = pgTable('expenses', {
   name: varchar({ length: 100 }).notNull(),
   amount: decimal().notNull(),
   date: timestamp().defaultNow().notNull(),
+});
+
+export const notesTable = pgTable('notes', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  userId: integer()
+    .notNull()
+    .references(() => usersTable.id, { onDelete: 'cascade' }),
+  title: varchar({ length: 255 }).notNull(),
+  description: text(),
+  status: varchar({ length: 20 }).notNull().default('active'),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
