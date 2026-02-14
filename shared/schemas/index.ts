@@ -93,6 +93,40 @@ export const drafExpenseSchema = z.object({
     .min(1, { message: 'Cantidad no válida' }),
 });
 
+export const draftNoteSchema = z.object({
+  title: z
+    .string()
+    .min(1, { message: 'El título de la nota es obligatorio' })
+    .max(255, { message: 'El título no puede superar 255 caracteres' }),
+  description: z
+    .string()
+    .max(3000, { message: 'La descripción no puede superar 3000 caracteres' })
+    .optional(),
+  status: z
+    .enum(['active', 'archived'], {
+      message: 'El estado debe ser "active" o "archived"',
+    })
+    .default('active'),
+});
+
+export const updateNoteSchema = z.object({
+  title: z
+    .string()
+    .min(1, { message: 'El título de la nota es obligatorio' })
+    .max(255, { message: 'El título no puede superar 255 caracteres' })
+    .optional(),
+  description: z
+    .string()
+    .max(3000, { message: 'La descripción no puede superar 3000 caracteres' })
+    .optional()
+    .nullable(),
+  status: z
+    .enum(['active', 'archived'], {
+      message: 'El estado debe ser "active" o "archived"',
+    })
+    .optional(),
+});
+
 /* APIS */
 
 export const ExpenseAPIResponseSchema = z.object({
