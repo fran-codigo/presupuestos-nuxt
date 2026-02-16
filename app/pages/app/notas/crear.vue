@@ -11,22 +11,16 @@ const formData = reactive({
   description: "",
   status: "active",
 });
-
-const loading = ref(false);
-
 const statusOptions = [
   { value: "active", label: "Activa" },
   { value: "archived", label: "Archivada" },
 ];
+const loading = ref(false);
 
 const onSubmit = async () => {
   try {
     loading.value = true;
-    const res = await create({
-      title: formData.title,
-      description: formData.description || null,
-      status: formData.status,
-    });
+    const res = await create(formData);
     toast.success({ message: res.message });
     await navigateTo("/app/notas");
   } catch (error) {
