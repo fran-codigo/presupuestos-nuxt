@@ -1,119 +1,71 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth',
-});
-
 const { handleErrors } = useHandleErrors();
-const toast = useToast();
 const route = useRoute();
-const router = useRouter();
+const toast = useToast();
 
-interface Note {
-  id: number;
-  title: string;
-  description: string | null;
-  status: 'active' | 'archived';
-  createdAt: string;
-  updatedAt: string;
-}
+const { data: note, pending } = await useFetch(`/api/notes/${route.params.id}`);
 
-interface FormData {
-  title: string;
-  description: string;
-  status: 'active' | 'archived';
-}
-
-const { data: note, pending } = await useFetch<Note>(`/api/notes/${route.params.id}`);
-
-const formData = reactive<FormData>({
-  title: '',
-  description: '',
-  status: 'active',
+const formData = reactive({
+  title: note.value?.title || '',
+  description: note.value?.description || '',
+  status: note.value?.status || 'active',
 });
 
 const loading = ref(false);
-const serverErrors = ref<string[]>([]);
 
 const statusOptions = [
   { value: 'active', label: 'Activa' },
   { value: 'archived', label: 'Archivada' },
 ];
 
-// Pre-fill form when note loads
-watch(
-  note,
-  (newNote) => {
-    if (newNote) {
-      formData.title = newNote.title;
-      formData.description = newNote.description || '';
-      formData.status = newNote.status;
-    }
-  },
-  { immediate: true }
-);
-
 const onSubmit = async () => {
   try {
     loading.value = true;
-    serverErrors.value = [];
-
-    // Only send fields that have changed or are different from original
-    const updatePayload: Partial<FormData> = {};
-
-    if (note.value && note.value.title !== formData.title) {
-      updatePayload.title = formData.title;
-    }
-
-    if (note.value && note.value.description !== (formData.description || null)) {
-      updatePayload.description = formData.description || null;
-    }
-
-    if (note.value && note.value.status !== formData.status) {
-      updatePayload.status = formData.status;
-    }
-
-    const res = await $fetch(`/api/notes/${route.params.id}`, {
+    // Envío simple: mandar el form completo
+    await $fetch(`/api/notes/${route.params.id}`, {
       method: 'PUT',
-      body: updatePayload,
+      body: {
+        title: formData.title,
+        description: formData.description || null,
+        status: formData.status,
+      },
     });
-
-    if (res && res.message) {
-      toast.success({
-        message: res.message,
-      });
-    }
-
-    await router.push(`/app/notas/${route.params.id}`);
-  } catch (error: any) {
-    if (error.data?.data && Array.isArray(error.data.data)) {
-      serverErrors.value = error.data.data;
-    }
+    await navigateTo(`/app/notas/${route.params.id}`);
+  } catch (error) {
     handleErrors(toast, error, 'Hubo un error al actualizar la nota');
   } finally {
     loading.value = false;
   }
 };
 
-const onCancel = () => {
-  router.push(`/app/notas/${route.params.id}`);
+const onCancel = async () => {
+  await navigateTo(`/app/notas/${route.params.id}`);
 };
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Loading State -->
-    <div v-if="pending" class="space-y-4">
+    <div
+      v-if="pending"
+      class="space-y-4"
+    >
       <USkeleton class="h-12 w-3/4" />
       <USkeleton class="h-96" />
       <USkeleton class="h-10 w-1/4" />
     </div>
 
     <!-- Edit Form -->
-    <div v-else-if="note" class="space-y-6">
+    <div
+      v-else-if="note"
+      class="space-y-6"
+    >
       <!-- Header -->
-      <div class="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4">
+      <div
+        class="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4"
+      >
         <div>
-          <h1 class="text-4xl font-black text-gray-900">Editar Nota</h1>
+          <h1 class="text-4xl font-black text-white">Editar Nota</h1>
           <p class="text-lg text-gray-600 mt-2">
             Actualiza tu
             <span class="text-blue-600 font-semibold">nota</span>
@@ -132,23 +84,26 @@ const onCancel = () => {
 
       <!-- Form Card -->
       <UCard class="max-w-2xl">
-        <form @submit.prevent="onSubmit" class="space-y-6">
+        <UForm
+          :state="formData"
+          @submit="onSubmit"
+          class="space-y-6"
+        >
           <!-- Title Field -->
           <div class="space-y-2">
-            <UFormGroup
+            <UFormField
               label="Título"
               name="title"
-              :error="serverErrors.length > 0 ? serverErrors[0] : undefined"
             >
               <UInput
                 v-model="formData.title"
                 placeholder="Título de la nota"
                 icon="i-heroicons-pencil-20-solid"
                 :disabled="loading"
-                size="md"
                 maxlength="255"
+                class="w-full"
               />
-            </UFormGroup>
+            </UFormField>
             <p class="text-xs text-gray-500">
               {{ formData.title.length }}/255 caracteres
             </p>
@@ -156,7 +111,7 @@ const onCancel = () => {
 
           <!-- Description Field -->
           <div class="space-y-2">
-            <UFormGroup
+            <UFormField
               label="Descripción"
               name="description"
               hint="Opcional"
@@ -166,8 +121,9 @@ const onCancel = () => {
                 placeholder="Escribe el contenido de tu nota..."
                 :disabled="loading"
                 maxlength="3000"
+                class="w-full"
               />
-            </UFormGroup>
+            </UFormField>
             <p class="text-xs text-gray-500">
               {{ formData.description.length }}/3000 caracteres
             </p>
@@ -175,31 +131,21 @@ const onCancel = () => {
 
           <!-- Status Field -->
           <div class="space-y-2">
-            <UFormGroup label="Estado" name="status">
+            <UFormField
+              label="Estado"
+              name="status"
+            >
               <USelect
                 v-model="formData.status"
-                :options="statusOptions"
-                option-attribute="label"
-                value-attribute="value"
+                :items="statusOptions"
+                class="w-full"
                 :disabled="loading"
-                size="md"
               />
-            </UFormGroup>
-          </div>
-
-          <!-- Error Messages -->
-          <div v-if="serverErrors.length > 0" class="space-y-2">
-            <UAlert
-              v-for="(error, index) in serverErrors"
-              :key="index"
-              color="warning"
-              icon="i-heroicons-exclamation-circle-20-solid"
-              :title="error"
-            />
+            </UFormField>
           </div>
 
           <!-- Actions -->
-          <div class="flex justify-end gap-3 pt-6 border-t">
+          <div class="flex items-center justify-end gap-3 pt-6 border-t">
             <UButton
               color="neutral"
               variant="ghost"
@@ -213,14 +159,18 @@ const onCancel = () => {
               icon="i-heroicons-check-20-solid"
               label="Guardar Cambios"
               :loading="loading"
+              :disabled="loading"
             />
           </div>
-        </form>
+        </UForm>
       </UCard>
     </div>
 
     <!-- Error State -->
-    <div v-else class="text-center py-12">
+    <div
+      v-else
+      class="text-center py-12"
+    >
       <UIcon
         name="i-heroicons-exclamation-triangle-20-solid"
         class="w-12 h-12 mx-auto text-red-400 mb-4"
