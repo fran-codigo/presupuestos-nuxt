@@ -1,11 +1,9 @@
 <script setup lang="ts">
-definePageMeta({
-  middleware: 'auth',
-});
-
+import { useNote } from "~/composables/useNote";
 const { handleErrors } = useHandleErrors();
 const toast = useToast();
 const route = useRoute();
+const { deleteNote } = useNote();
 
 const {
   data: note,
@@ -17,34 +15,34 @@ const deleteLoading = ref(false);
 const isDeleteDialogOpen = ref(false);
 
 const statusLabel = computed(() => {
-  return note.value?.status === 'active' ? 'Activa' : 'Archivada';
+  return note.value?.status === "active" ? "Activa" : "Archivada";
 });
 
 const statusColor = computed(() => {
-  return note.value?.status === 'active' ? 'primary' : 'neutral';
+  return note.value?.status === "active" ? "primary" : "neutral";
 });
 
 const formattedCreatedDate = computed(() => {
-  if (!note.value?.createdAt) return '';
+  if (!note.value?.createdAt) return "";
   const date = new Date(note.value.createdAt);
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return date.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 });
 
 const formattedUpdatedDate = computed(() => {
-  if (!note.value?.updatedAt) return '';
+  if (!note.value?.updatedAt) return "";
   const date = new Date(note.value.updatedAt);
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return date.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 });
 
@@ -52,9 +50,7 @@ const onDelete = async () => {
   try {
     deleteLoading.value = true;
 
-    const res = await $fetch(`/api/notes/${route.params.id}`, {
-      method: 'DELETE',
-    });
+    const res = await deleteNote(Number(route.params.id));
 
     if (res && res.message) {
       toast.success({
@@ -63,9 +59,9 @@ const onDelete = async () => {
     }
 
     isDeleteDialogOpen.value = false;
-    await navigateTo('/app/notas');
+    await navigateTo("/app/notas");
   } catch (error) {
-    handleErrors(toast, error, 'Hubo un error al eliminar la nota');
+    handleErrors(toast, error, "Hubo un error al eliminar la nota");
   } finally {
     deleteLoading.value = false;
   }
@@ -73,16 +69,13 @@ const onDelete = async () => {
 
 // navegación directa con `:to` en el botón Editar
 
-provide('refreshNotes', refresh);
+provide("refreshNotes", refresh);
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- Loading State -->
-    <div
-      v-if="pending"
-      class="space-y-6"
-    >
+    <div v-if="pending" class="space-y-6">
       <div class="space-y-3">
         <USkeleton class="h-12 w-3/4" />
         <div class="flex gap-4">
@@ -98,22 +91,28 @@ provide('refreshNotes', refresh);
     </div>
 
     <!-- Note Content -->
-    <div
-      v-else-if="note"
-      class="space-y-6"
-    >
+    <div v-else-if="note" class="space-y-6">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+      <div
+        class="flex flex-col md:flex-row md:justify-between md:items-start gap-6"
+      >
         <div class="flex-1">
-          <h1 class="text-4xl md:text-5xl font-extrabold text-gray-100 leading-tight wrap-break-words">
+          <h1
+            class="text-4xl md:text-5xl font-extrabold text-gray-100 leading-tight wrap-break-words"
+          >
             {{ note.title }}
           </h1>
-          <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-200">
+          <div
+            class="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-200"
+          >
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-calendar-20-solid" class="w-4 h-4" />
               <span class="text-sm">{{ formattedCreatedDate }}</span>
             </div>
-            <div v-if="note.createdAt !== note.updatedAt" class="flex items-center gap-2">
+            <div
+              v-if="note.createdAt !== note.updatedAt"
+              class="flex items-center gap-2"
+            >
               <UIcon name="i-heroicons-pencil-20-solid" class="w-4 h-4" />
               <span class="text-sm">{{ formattedUpdatedDate }}</span>
             </div>
@@ -128,7 +127,11 @@ provide('refreshNotes', refresh);
           >
             <div class="flex items-center gap-2">
               <UIcon
-                :name="statusColor === 'primary' ? 'i-heroicons-check-circle-20-solid' : 'i-heroicons-archive-box-20-solid'"
+                :name="
+                  statusColor === 'primary'
+                    ? 'i-heroicons-check-circle-20-solid'
+                    : 'i-heroicons-archive-box-20-solid'
+                "
                 class="w-4 h-4"
               />
               {{ statusLabel }}
@@ -153,13 +156,18 @@ provide('refreshNotes', refresh);
         </template>
 
         <div class="prose prose-sm max-w-none">
-          <div class="whitespace-pre-wrap text-gray-200 leading-relaxed text-base font-normal">
+          <div
+            class="whitespace-pre-wrap text-gray-200 leading-relaxed text-base font-normal"
+          >
             {{ note.description }}
           </div>
         </div>
       </UCard>
 
-      <div v-else class="rounded-lg bg-gray-50 dark:bg-gray-900/50 border-2 border-dashed border-gray-200 dark:border-gray-800 p-12 text-center">
+      <div
+        v-else
+        class="rounded-lg bg-gray-50 dark:bg-gray-900/50 border-2 border-dashed border-gray-200 dark:border-gray-800 p-12 text-center"
+      >
         <UIcon
           name="i-heroicons-document-text-20-solid"
           class="w-12 h-12 mx-auto text-gray-400 mb-4"
@@ -170,11 +178,10 @@ provide('refreshNotes', refresh);
       </div>
 
       <!-- Actions -->
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-800">
-        <NuxtLink
-          to="/app/notas"
-          class="order-2 sm:order-1"
-        >
+      <div
+        class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-800"
+      >
+        <NuxtLink to="/app/notas" class="order-2 sm:order-1">
           <UButton
             color="neutral"
             variant="ghost"
@@ -184,22 +191,22 @@ provide('refreshNotes', refresh);
         </NuxtLink>
 
         <div class="flex gap-3 order-1 sm:order-2">
-            <UButton
-              :to="`/app/notas/${route.params.id}/editar`"
-              icon="i-heroicons-pencil-square-20-solid"
-              color="secondary"
-              variant="soft"
-              label="Editar"
-              size="md"
-            />
-            <UButton
-              icon="i-heroicons-trash-20-solid"
-              color="warning"
-              variant="soft"
-              label="Eliminar"
-              @click="isDeleteDialogOpen = true"
-              size="md"
-            />
+          <UButton
+            :to="`/app/notas/${route.params.id}/editar`"
+            icon="i-heroicons-pencil-square-20-solid"
+            color="secondary"
+            variant="soft"
+            label="Editar"
+            size="md"
+          />
+          <UButton
+            icon="i-heroicons-trash-20-solid"
+            color="warning"
+            variant="soft"
+            label="Eliminar"
+            @click="isDeleteDialogOpen = true"
+            size="md"
+          />
         </div>
       </div>
     </div>
@@ -232,7 +239,7 @@ provide('refreshNotes', refresh);
     </div>
 
     <!-- Delete Confirmation Dialog -->
-     <UiConfirmModal
+    <UiConfirmModal
       :open="isDeleteDialogOpen"
       title="Eliminar Nota"
       description="Esta acción no se puede deshacer."
@@ -241,6 +248,6 @@ provide('refreshNotes', refresh);
       confirm-color="warning"
       @confirm="onDelete"
       @cancel="isDeleteDialogOpen = false"
-     />
+    />
   </div>
 </template>
