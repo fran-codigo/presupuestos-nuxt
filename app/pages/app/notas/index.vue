@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useNote } from "~/composables/useNote";
+
 const { data: notes, refresh, pending } = await useFetch("/api/notes");
 
 const toast = useToast();
+const { updateStatus } = useNote();
 
 const toggling = reactive<Record<number, boolean>>({});
 const toggleDialogOpen = ref(false);
@@ -22,10 +25,7 @@ const confirmToggleStatus = async () => {
   try {
     toggling[note.id] = true;
     const newStatus = note.status === "active" ? "archived" : "active";
-    await $fetch(`/api/notes/${note.id}/update-status`, {
-      method: "PUT",
-      body: { status: newStatus },
-    });
+    await updateStatus(note.id, newStatus);
     toggleDialogOpen.value = false;
     noteToToggle.value = null;
     await refresh();
