@@ -232,33 +232,15 @@ provide('refreshNotes', refresh);
     </div>
 
     <!-- Delete Confirmation Dialog -->
-    <UModal
-      v-model:open="isDeleteDialogOpen"
+     <UiConfirmModal
+      :open="isDeleteDialogOpen"
       title="Eliminar Nota"
       description="Esta acción no se puede deshacer."
-      :transition="true"
-      :overlay="true"
-      :close-on-overlay-click="false"
-      :close-on-esc="false"
-    >
-      <template #footer>
-        <div class="flex justify-end gap-3 w-full">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            label="Cancelar"
-            @click="isDeleteDialogOpen = false"
-            :disabled="deleteLoading"
-          />
-          <UButton
-            color="warning"
-            icon="i-heroicons-trash-20-solid"
-            label="Sí, Eliminar"
-            :loading="deleteLoading"
-            @click="onDelete"
-          />
-        </div>
-      </template>
-    </UModal>
+      confirm-label="Sí, Eliminar"
+      cancel-label="Cancelar"
+      confirm-color="warning"
+      @confirm="onDelete"
+      @cancel="isDeleteDialogOpen = false"
+     />
   </div>
 </template>

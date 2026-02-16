@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: notes, refresh, pending } = await useFetch('/api/notes');
+const { data: notes, refresh, pending } = await useFetch("/api/notes");
 
 const toast = useToast();
 
@@ -21,22 +21,22 @@ const confirmToggleStatus = async () => {
   const note = noteToToggle.value;
   try {
     toggling[note.id] = true;
-    const newStatus = note.status === 'active' ? 'archived' : 'active';
-    await $fetch(`/api/notes/${note.id}`, {
-      method: 'PUT',
+    const newStatus = note.status === "active" ? "archived" : "active";
+    await $fetch(`/api/notes/${note.id}/update-status`, {
+      method: "PUT",
       body: { status: newStatus },
     });
     toggleDialogOpen.value = false;
     noteToToggle.value = null;
     await refresh();
     toast.success({
-      message: `Nota ${newStatus === 'active' ? 'activada' : 'archivada'} correctamente`,
+      message: `Nota ${newStatus === "active" ? "activada" : "archivada"} correctamente`,
     });
   } catch (err) {
     toast.error({
-      message: 'No se pudo cambiar el estado de la nota',
+      message: "No se pudo cambiar el estado de la nota",
     });
-    console.error('Error updating note status', err);
+    console.error("Error updating note status", err);
   } finally {
     toggling[note.id] = false;
   }
@@ -46,7 +46,7 @@ const onModalClose = () => {
   noteToToggle.value = null;
 };
 
-provide('refreshNotes', refresh);
+provide("refreshNotes", refresh);
 </script>
 
 <template>
@@ -87,33 +87,20 @@ provide('refreshNotes', refresh);
       </NuxtLink>
     </div>
 
-    <UDivider />
-
     <!-- Notas Grid -->
     <div
       v-if="pending"
       class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
     >
-      <USkeleton
-        v-for="i in 6"
-        :key="i"
-        class="h-40 rounded-lg"
-      />
+      <USkeleton v-for="i in 6" :key="i" class="h-40 rounded-lg" />
     </div>
 
     <div
       v-else-if="notes && notes.length > 0"
       class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-max"
     >
-      <div
-        v-for="note in notes"
-        :key="note.id"
-        class="group h-full"
-      >
-        <NuxtLink
-          :to="`/app/notas/${note.id}`"
-          class="block h-full"
-        >
+      <div v-for="note in notes" :key="note.id" class="group h-full">
+        <NuxtLink :to="`/app/notas/${note.id}`" class="block h-full">
           <UCard
             class="h-full cursor-pointer hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-l-4 border-l-primary-500/80 hover:border-l-primary-400"
             variant="soft"
@@ -133,7 +120,7 @@ provide('refreshNotes', refresh);
                   size="sm"
                   @click.stop.prevent="openToggleDialog(note, $event)"
                 >
-                  {{ note.status === 'active' ? '✓ Activa' : '⊘ Archivada' }}
+                  {{ note.status === "active" ? "✓ Activa" : "⊘ Archivada" }}
                 </UBadge>
               </div>
             </template>
@@ -144,10 +131,7 @@ provide('refreshNotes', refresh);
             >
               {{ note.description }}
             </p>
-            <p
-              v-else
-              class="text-gray-400/70 text-sm font-medium"
-            >
+            <p v-else class="text-gray-400/70 text-sm font-medium">
               Sin descripción
             </p>
 
@@ -160,7 +144,7 @@ provide('refreshNotes', refresh);
                     name="i-heroicons-calendar-days-20-solid"
                     class="w-3.5 h-3.5 text-primary-400/60"
                   />
-                  {{ new Date(note.createdAt).toLocaleDateString('es-ES') }}
+                  {{ new Date(note.createdAt).toLocaleDateString("es-ES") }}
                 </span>
                 <UIcon
                   name="i-heroicons-chevron-right-20-solid"
@@ -174,10 +158,7 @@ provide('refreshNotes', refresh);
     </div>
 
     <!-- Empty State -->
-    <div
-      v-else
-      class="py-24 text-center px-4"
-    >
+    <div v-else class="py-24 text-center px-4">
       <div
         class="inline-block p-4 bg-primary-500/10 rounded-full mb-6 ring-2 ring-primary-500/20"
       >
@@ -206,30 +187,12 @@ provide('refreshNotes', refresh);
     </div>
   </div>
 
-  <UModal v-model:open="toggleDialogOpen" :title="'Cambiar estado'" :description="'Confirma que deseas cambiar el estado de esta nota'" @update:open="!$event && onModalClose()">
-    <div class="px-4 py-2">
-      <p class="text-sm text-gray-600">
-        Estás a punto de
-        <span class="font-semibold">{{ noteToToggle?.status === 'active' ? 'archivar' : 'activar' }}</span>
-        la nota <span class="font-semibold">"{{ noteToToggle?.title }}"</span>
-      </p>
-    </div>
-
-    <template #footer>
-      <div class="flex justify-end gap-3 w-full px-3 py-2">
-        <UButton
-          color="neutral"
-          variant="ghost"
-          label="Cancelar"
-          @click="toggleDialogOpen = false"
-        />
-        <UButton
-          color="primary"
-          label="Confirmar"
-          :loading="!!(noteToToggle && toggling[noteToToggle.id])"
-          @click="confirmToggleStatus"
-        />
-      </div>
-    </template>
-  </UModal>
+  <UiConfirmModal
+    v-model:open="toggleDialogOpen"
+    title="Cambiar estado"
+    description="Confirma que deseas cambiar el estado de esta nota"
+    :confirm-loading="!!(noteToToggle && toggling[noteToToggle.id])"
+    @confirm="confirmToggleStatus"
+    @cancel="onModalClose"
+  />
 </template>
