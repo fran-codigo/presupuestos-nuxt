@@ -8,7 +8,7 @@ const { user } = useUserSession();
       Bienvenido: <span class="font-bold">{{ user?.name }}</span>
     </h1>
     <p class="text-gray-600 mt-2">
-      Desde aquí puedes administrar tus presupuestos
+      Desde aquí puedes administrar tus presupuestos y notas
     </p>
 
     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">

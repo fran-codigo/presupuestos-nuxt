@@ -8,7 +8,7 @@
       >
         <div class="w-96 text-center lg:text-left">
           <NuxtLink to="/app" class="text-white text-3xl font-bold">
-            Presupuestos
+            Finio
           </NuxtLink>
         </div>
 
