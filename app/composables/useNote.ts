@@ -13,6 +13,14 @@ export const useNote = () => {
     });
     return res;
   };
+
+  const updateNote = async (noteId: number, data: any) => {
+    const res = await $fetch(`/api/notes/${noteId}`, {
+      method: "PUT",
+      body: data,
+    });
+    return res;
+  };
   
   const updateStatus = async (noteId: number, status: string) => {
     const res = await $fetch(`/api/notes/${noteId}/update-status`, {
@@ -25,6 +33,7 @@ export const useNote = () => {
   return {
     create,
     deleteNote,
+    updateNote,
     updateStatus,
   };
 };
