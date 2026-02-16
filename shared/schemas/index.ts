@@ -127,6 +127,12 @@ export const updateNoteSchema = z.object({
     .optional(),
 });
 
+export const updateNoteStatusSchema = z.object({
+  status: z.enum(['active', 'archived'], {
+    message: 'El estado debe ser "active" o "archived"',
+  }),
+});
+
 /* APIS */
 
 export const ExpenseAPIResponseSchema = z.object({
