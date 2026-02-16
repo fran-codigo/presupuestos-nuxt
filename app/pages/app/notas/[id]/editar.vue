@@ -25,11 +25,7 @@ const onSubmit = async () => {
   try {
     loading.value = true;
     // Envío simple: mandar el form completo
-    const res = await updateNote(Number(route.params.id), {
-      title: formData.title,
-      description: formData.description || null,
-      status: formData.status,
-    });
+    const res = await updateNote(Number(route.params.id), formData);
     toast.success({ message: res.message });
     await navigateTo(`/app/notas/${route.params.id}`);
   } catch (error) {

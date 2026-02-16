@@ -67,8 +67,6 @@ const onDelete = async () => {
   }
 };
 
-// navegación directa con `:to` en el botón Editar
-
 provide("refreshNotes", refresh);
 </script>
 
