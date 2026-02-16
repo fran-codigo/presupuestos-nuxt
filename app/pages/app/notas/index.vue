@@ -4,11 +4,21 @@ import { useNote } from "~/composables/useNote";
 const { data: notes, refresh, pending } = await useFetch("/api/notes");
 
 const toast = useToast();
-const { updateStatus } = useNote();
+const { updateStatus, deleteNote } = useNote();
+
+const route = useRoute();
+const router = useRouter();
 
 const toggling = reactive<Record<number, boolean>>({});
 const toggleDialogOpen = ref(false);
 const noteToToggle = ref<any | null>(null);
+
+const deleting = reactive<Record<number, boolean>>({});
+const deleteDialogOpen = ref(false);
+const noteToDelete = ref<any | null>(null);
+
+const detailsDialogOpen = ref(false);
+const noteIdToView = ref<number | null>(null);
 
 const openToggleDialog = (note: any, event?: Event) => {
   if (event) {
@@ -42,9 +52,82 @@ const confirmToggleStatus = async () => {
   }
 };
 
+watch(
+  () => detailsDialogOpen.value,
+  async (open) => {
+    if (open) return;
+    await closeDetailsModal();
+  },
+);
+
 const onModalClose = () => {
   noteToToggle.value = null;
 };
+
+const openDeleteDialog = (note: any, event?: Event) => {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  noteToDelete.value = note;
+  deleteDialogOpen.value = true;
+};
+
+const confirmDeleteNote = async () => {
+  if (!noteToDelete.value) return;
+  const note = noteToDelete.value;
+  try {
+    deleting[note.id] = true;
+    const res = await deleteNote(note.id);
+    if (res?.message) {
+      toast.success({ message: res.message });
+    }
+    deleteDialogOpen.value = false;
+    noteToDelete.value = null;
+    await refresh();
+  } catch (err) {
+    toast.error({ message: "No se pudo eliminar la nota" });
+    console.error("Error deleting note", err);
+  } finally {
+    deleting[note.id] = false;
+  }
+};
+
+const onDeleteModalClose = () => {
+  noteToDelete.value = null;
+};
+
+const openDetailsModal = (noteId: number, event?: Event) => {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  noteIdToView.value = noteId;
+  detailsDialogOpen.value = true;
+};
+
+const closeDetailsModal = async () => {
+  detailsDialogOpen.value = false;
+  noteIdToView.value = null;
+
+  if (route.query.noteId) {
+    const query = { ...route.query };
+    delete query.noteId;
+    await router.replace({ path: route.path, query });
+  }
+};
+
+watch(
+  () => route.query.noteId,
+  (noteId) => {
+    if (!noteId) return;
+    const parsed = Number(noteId);
+    if (!Number.isFinite(parsed)) return;
+    noteIdToView.value = parsed;
+    detailsDialogOpen.value = true;
+  },
+  { immediate: true },
+);
 
 provide("refreshNotes", refresh);
 </script>
@@ -100,18 +183,19 @@ provide("refreshNotes", refresh);
       class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-max"
     >
       <div v-for="note in notes" :key="note.id" class="group h-full">
-        <NuxtLink :to="`/app/notas/${note.id}`" class="block h-full">
-          <UCard
-            class="h-full cursor-pointer hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-l-4 border-l-primary-500/80 hover:border-l-primary-400"
-            variant="soft"
-          >
-            <template #header>
-              <div class="flex items-start justify-between gap-3 pb-2">
-                <h3
-                  class="text-lg font-bold text-white line-clamp-2 flex-1 group-hover:text-primary-300 transition-colors duration-300"
-                >
-                  {{ note.title }}
-                </h3>
+        <UCard
+          class="h-full cursor-pointer hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-l-4 border-l-primary-500/80 hover:border-l-primary-400"
+          variant="soft"
+          @click="openDetailsModal(note.id, $event)"
+        >
+          <template #header>
+            <div class="flex items-start justify-between gap-3 pb-2">
+              <h3
+                class="text-lg font-bold text-white line-clamp-2 flex-1 group-hover:text-primary-300 transition-colors duration-300"
+              >
+                {{ note.title }}
+              </h3>
+              <div class="flex items-center gap-2">
                 <UBadge
                   :color="note.status === 'active' ? 'primary' : 'neutral'"
                   variant="subtle"
@@ -122,38 +206,54 @@ provide("refreshNotes", refresh);
                 >
                   {{ note.status === "active" ? "✓ Activa" : "⊘ Archivada" }}
                 </UBadge>
-              </div>
-            </template>
 
-            <p
-              v-if="note.description"
-              class="text-gray-500 line-clamp-3 text-sm leading-relaxed font-medium"
-            >
-              {{ note.description }}
-            </p>
-            <p v-else class="text-gray-400/70 text-sm font-medium">
-              Sin descripción
-            </p>
+                <UButton
+                  color="secondary"
+                  variant="ghost"
+                  icon="i-heroicons-pencil-square-20-solid"
+                  :to="`/app/notas/${note.id}/editar`"
+                  @click.stop
+                />
 
-            <template #footer>
-              <div
-                class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-700/50"
-              >
-                <span class="flex items-center gap-1.5 font-medium">
-                  <UIcon
-                    name="i-heroicons-calendar-days-20-solid"
-                    class="w-3.5 h-3.5 text-primary-400/60"
-                  />
-                  {{ new Date(note.createdAt).toLocaleDateString("es-ES") }}
-                </span>
-                <UIcon
-                  name="i-heroicons-chevron-right-20-solid"
-                  class="w-4 h-4 group-hover:translate-x-2 transition-all text-gray-500 group-hover:text-primary-400"
+                <UButton
+                  color="warning"
+                  variant="ghost"
+                  icon="i-heroicons-trash-20-solid"
+                  :loading="deleting[note.id]"
+                  @click.stop.prevent="openDeleteDialog(note, $event)"
                 />
               </div>
-            </template>
-          </UCard>
-        </NuxtLink>
+            </div>
+          </template>
+
+          <p
+            v-if="note.description"
+            class="text-gray-500 line-clamp-3 text-sm leading-relaxed font-medium"
+          >
+            {{ note.description }}
+          </p>
+          <p v-else class="text-gray-400/70 text-sm font-medium">
+            Sin descripción
+          </p>
+
+          <template #footer>
+            <div
+              class="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-700/50"
+            >
+              <span class="flex items-center gap-1.5 font-medium">
+                <UIcon
+                  name="i-heroicons-calendar-days-20-solid"
+                  class="w-3.5 h-3.5 text-primary-400/60"
+                />
+                {{ new Date(note.createdAt).toLocaleDateString("es-ES") }}
+              </span>
+              <UIcon
+                name="i-heroicons-eye-20-solid"
+                class="w-4 h-4 text-gray-500 group-hover:text-primary-400"
+              />
+            </div>
+          </template>
+        </UCard>
       </div>
     </div>
 
@@ -194,5 +294,21 @@ provide("refreshNotes", refresh);
     :confirm-loading="!!(noteToToggle && toggling[noteToToggle.id])"
     @confirm="confirmToggleStatus"
     @cancel="onModalClose"
+  />
+
+  <NotesNoteDetailsModal
+    v-model:open="detailsDialogOpen"
+    :note-id="noteIdToView"
+  />
+
+  <UiConfirmModal
+    v-model:open="deleteDialogOpen"
+    title="Eliminar Nota"
+    description="Esta acción no se puede deshacer."
+    :confirm-loading="!!(noteToDelete && deleting[noteToDelete.id])"
+    confirm-label="Sí, eliminar"
+    confirm-color="warning"
+    @confirm="confirmDeleteNote"
+    @cancel="onDeleteModalClose"
   />
 </template>

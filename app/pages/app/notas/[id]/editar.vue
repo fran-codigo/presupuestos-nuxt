@@ -27,7 +27,7 @@ const onSubmit = async () => {
     // Envío simple: mandar el form completo
     const res = await updateNote(Number(route.params.id), formData);
     toast.success({ message: res.message });
-    await navigateTo(`/app/notas/${route.params.id}`);
+    await navigateTo(`/app/notas/`);
   } catch (error) {
     handleErrors(toast, error, "Hubo un error al actualizar la nota");
   } finally {
@@ -36,7 +36,7 @@ const onSubmit = async () => {
 };
 
 const onCancel = async () => {
-  await navigateTo(`/app/notas/${route.params.id}`);
+  await navigateTo(`/app/notas/`);
 };
 </script>
 
