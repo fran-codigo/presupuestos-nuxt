@@ -1,6 +1,51 @@
 <script setup lang="ts">
 const { data: notes, refresh, pending } = await useFetch('/api/notes');
 
+const toast = useToast();
+
+const toggling = reactive<Record<number, boolean>>({});
+const toggleDialogOpen = ref(false);
+const noteToToggle = ref<any | null>(null);
+
+const openToggleDialog = (note: any, event?: Event) => {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  noteToToggle.value = note;
+  toggleDialogOpen.value = true;
+};
+
+const confirmToggleStatus = async () => {
+  if (!noteToToggle.value) return;
+  const note = noteToToggle.value;
+  try {
+    toggling[note.id] = true;
+    const newStatus = note.status === 'active' ? 'archived' : 'active';
+    await $fetch(`/api/notes/${note.id}`, {
+      method: 'PUT',
+      body: { status: newStatus },
+    });
+    toggleDialogOpen.value = false;
+    noteToToggle.value = null;
+    await refresh();
+    toast.success({
+      message: `Nota ${newStatus === 'active' ? 'activada' : 'archivada'} correctamente`,
+    });
+  } catch (err) {
+    toast.error({
+      message: 'No se pudo cambiar el estado de la nota',
+    });
+    console.error('Error updating note status', err);
+  } finally {
+    toggling[note.id] = false;
+  }
+};
+
+const onModalClose = () => {
+  noteToToggle.value = null;
+};
+
 provide('refreshNotes', refresh);
 </script>
 
@@ -83,8 +128,10 @@ provide('refreshNotes', refresh);
                 <UBadge
                   :color="note.status === 'active' ? 'primary' : 'neutral'"
                   variant="subtle"
-                  class="text-xs whitespace-nowrap"
+                  class="text-xs whitespace-nowrap cursor-pointer"
+                  :class="{ 'opacity-60': toggling[note.id] }"
                   size="sm"
+                  @click.stop.prevent="openToggleDialog(note, $event)"
                 >
                   {{ note.status === 'active' ? '✓ Activa' : '⊘ Archivada' }}
                 </UBadge>
@@ -158,4 +205,31 @@ provide('refreshNotes', refresh);
       </NuxtLink>
     </div>
   </div>
+
+  <UModal v-model:open="toggleDialogOpen" :title="'Cambiar estado'" :description="'Confirma que deseas cambiar el estado de esta nota'" @update:open="!$event && onModalClose()">
+    <div class="px-4 py-2">
+      <p class="text-sm text-gray-600">
+        Estás a punto de
+        <span class="font-semibold">{{ noteToToggle?.status === 'active' ? 'archivar' : 'activar' }}</span>
+        la nota <span class="font-semibold">"{{ noteToToggle?.title }}"</span>
+      </p>
+    </div>
+
+    <template #footer>
+      <div class="flex justify-end gap-3 w-full px-3 py-2">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          label="Cancelar"
+          @click="toggleDialogOpen = false"
+        />
+        <UButton
+          color="primary"
+          label="Confirmar"
+          :loading="!!(noteToToggle && toggling[noteToToggle.id])"
+          @click="confirmToggleStatus"
+        />
+      </div>
+    </template>
+  </UModal>
 </template>
