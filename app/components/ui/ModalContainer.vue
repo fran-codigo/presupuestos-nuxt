@@ -71,16 +71,7 @@ const closeModal = () => {
 <template>
   <UModal v-model:open="show">
     <template #content>
-      <UCard
-        :ui="{
-          ring: 'ring-1 ring-gray-800',
-          divide: 'divide-y divide-gray-800',
-          background: 'bg-gray-900',
-          rounded: 'rounded-2xl',
-          shadow: 'shadow-2xl',
-          body: { padding: 'p-8 sm:p-10' },
-        }"
-      >
+      <UCard>
         <component
           v-if="ComponentToRender"
           :is="ComponentToRender"
