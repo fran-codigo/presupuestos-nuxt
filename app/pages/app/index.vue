@@ -86,6 +86,34 @@ const { user } = useUserSession();
           </div>
         </UCard>
       </NuxtLink>
+
+      <NuxtLink to="/app/ideas" class="group h-full block">
+        <UCard
+          class="h-full cursor-pointer hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-l-4 border-l-violet-500/80 hover:border-l-violet-400 flex flex-col justify-center p-4"
+          variant="soft"
+        >
+          <div class="flex flex-col items-center text-center space-y-4">
+            <div
+              class="p-4 bg-violet-500/10 rounded-full ring-2 ring-violet-500/20 group-hover:bg-violet-500/20 transition-colors"
+            >
+              <UIcon
+                name="i-heroicons-light-bulb-20-solid"
+                class="w-10 h-10 text-violet-400"
+              />
+            </div>
+            <div>
+              <h2
+                class="text-2xl font-bold text-white group-hover:text-violet-300 transition-colors duration-300"
+              >
+                Ideas
+              </h2>
+              <p class="text-sm text-gray-400 mt-2 font-medium">
+                Transforma tus ideas en estructuras listas para crear tu MVP.
+              </p>
+            </div>
+          </div>
+        </UCard>
+      </NuxtLink>
     </div>
   </div>
 </template>
