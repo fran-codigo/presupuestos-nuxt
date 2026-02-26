@@ -15,9 +15,9 @@ import {
   boolean,
   timestamp,
   text,
-} from 'drizzle-orm/pg-core';
+} from "drizzle-orm/pg-core";
 
-export const usersTable = pgTable('users', {
+export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
   email: varchar({ length: 100 }).notNull().unique(),
@@ -26,33 +26,43 @@ export const usersTable = pgTable('users', {
   confirmed: boolean().default(false).notNull(),
 });
 
-export const budgetsTable = pgTable('budgets', {
+export const budgetsTable = pgTable("budgets", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   userId: integer()
     .notNull()
-    .references(() => usersTable.id, { onDelete: 'cascade' }),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   name: varchar({ length: 100 }).notNull(),
   amount: decimal().notNull(),
 });
 
-export const expensesTable = pgTable('expenses', {
+export const expensesTable = pgTable("expenses", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   budgetId: integer()
     .notNull()
-    .references(() => budgetsTable.id, { onDelete: 'cascade' }),
+    .references(() => budgetsTable.id, { onDelete: "cascade" }),
   name: varchar({ length: 100 }).notNull(),
   amount: decimal().notNull(),
   date: timestamp().defaultNow().notNull(),
 });
 
-export const notesTable = pgTable('notes', {
+export const notesTable = pgTable("notes", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   userId: integer()
     .notNull()
-    .references(() => usersTable.id, { onDelete: 'cascade' }),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   title: varchar({ length: 255 }).notNull(),
   description: text(),
-  status: varchar({ length: 20 }).notNull().default('active'),
+  status: varchar({ length: 20 }).notNull().default("active"),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
+});
+
+export const ideasTable = pgTable("ideas", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  userId: integer()
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  title: varchar({ length: 255 }).notNull(),
+  content: text().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
 });
