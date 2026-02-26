@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { shallowRef } from "vue";
+import { shallowRef } from 'vue';
 
 const items = [
   {
-    label: "Mi cuenta",
-    icon: "i-heroicons-user-circle",
-    slot: "account",
+    label: 'Mi cuenta',
+    icon: 'i-heroicons-user-circle',
+    slot: 'account',
   },
   {
-    label: "Seguridad",
-    icon: "i-heroicons-lock-closed",
-    slot: "security",
+    label: 'Seguridad',
+    icon: 'i-heroicons-lock-closed',
+    slot: 'security',
   },
 ];
 </script>
@@ -31,17 +31,11 @@ const items = [
       </p>
     </div>
 
-    <UCard
-      :ui="{
-        ring: 'ring-1 ring-gray-800',
-        divide: 'divide-y divide-gray-800',
-        background: 'bg-gray-900',
-        rounded: 'rounded-2xl',
-        shadow: 'shadow-xl',
-        body: { padding: 'p-6 sm:p-8' },
-      }"
-    >
-      <UTabs :items="items" class="w-full">
+    <UCard class="w-2/3">
+      <UTabs
+        :items="items"
+        class="w-full"
+      >
         <template #account>
           <div class="mt-6 space-y-6">
             <div>

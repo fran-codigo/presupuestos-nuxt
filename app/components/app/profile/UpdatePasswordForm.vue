@@ -51,6 +51,7 @@ const onSubmit = async () => {
         color="primary"
         variant="outline"
         icon="i-heroicons-lock-closed"
+        class="block w-1/2"
       />
     </div>
 
@@ -67,6 +68,7 @@ const onSubmit = async () => {
         color="primary"
         variant="outline"
         icon="i-heroicons-key"
+        class="block w-1/2"
       />
     </div>
 
@@ -86,6 +88,7 @@ const onSubmit = async () => {
         color="primary"
         variant="outline"
         icon="i-heroicons-key"
+        class="block w-1/2"
       />
     </div>
 
