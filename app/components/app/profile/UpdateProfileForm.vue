@@ -5,8 +5,8 @@ const toast = useToast();
 
 const loading = ref(false);
 const formData = reactive({
-  name: user.value?.name || '',
-  email: user.value?.email || '',
+  name: user.value?.name || "",
+  email: user.value?.email || "",
 });
 
 const onSubmit = async () => {
@@ -14,8 +14,8 @@ const onSubmit = async () => {
     loading.value = true;
 
     // Enviamos la actualización
-    const res = await $fetch('/api/user/update', {
-      method: 'PUT',
+    const res = await $fetch("/api/user/update", {
+      method: "PUT",
       body: formData,
     });
 
@@ -25,7 +25,7 @@ const onSubmit = async () => {
       message: res.message,
     });
   } catch (error) {
-    handleErrors(toast, error, 'Hubo un error al actualizar tu perfil');
+    handleErrors(toast, error, "Hubo un error al actualizar tu perfil");
   } finally {
     loading.value = false;
   }
@@ -33,50 +33,51 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <div>
-    <form
-      @submit.prevent="onSubmit"
-      class="space-y-3"
-    >
-      <div class="space-y-3">
-        <label
-          for="name"
-          class="text-sm uppercase font-bold"
-        >
-          Nombre Completo
-        </label>
-        <input
-          id="name"
-          v-model="formData.name"
-          type="text"
-          placeholder="Tu nombre completo"
-          class="w-full p-3 border border-gray-300 bg-gray-50 rounded focus:bg-white focus:border-blue-500 outline-none transition-all"
-        />
-      </div>
+  <form @submit.prevent="onSubmit" class="space-y-5">
+    <div class="space-y-2">
+      <label for="name" class="block text-sm font-semibold text-gray-300">
+        Nombre Completo
+      </label>
+      <UInput
+        id="name"
+        v-model="formData.name"
+        type="text"
+        placeholder="Tu nombre completo"
+        size="lg"
+        color="primary"
+        variant="outline"
+        icon="i-heroicons-user"
+        class="block w-1/2"
+      />
+    </div>
 
-      <div class="space-y-3">
-        <label
-          for="email"
-          class="text-sm uppercase font-bold"
-        >
-          Correo Electrónico
-        </label>
-        <input
-          id="email"
-          v-model="formData.email"
-          type="email"
-          placeholder="tu@email.com"
-          class="w-full p-3 border border-gray-300 bg-gray-50 rounded focus:bg-white focus:border-blue-500 outline-none transition-all"
-        />
-      </div>
+    <div class="space-y-2">
+      <label for="email" class="block text-sm font-semibold text-gray-300">
+        Correo Electrónico
+      </label>
+      <UInput
+        id="email"
+        v-model="formData.email"
+        type="email"
+        placeholder="tu@email.com"
+        size="lg"
+        color="primary"
+        variant="outline"
+        icon="i-heroicons-envelope"
+        class="block w-1/2"
+      />
+    </div>
 
-      <button
+    <div class="pt-4 border-t border-gray-800">
+      <UButton
         type="submit"
-        :disabled="loading"
-        class="bg-blue-600 w-full p-3 text-white uppercase font-bold hover:bg-blue-700 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded"
-      >
-        {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
-      </button>
-    </form>
-  </div>
+        :loading="loading"
+        color="primary"
+        variant="solid"
+        size="xl"
+        class="w-full justify-center"
+        :label="loading ? 'Guardando...' : 'Guardar Cambios'"
+      />
+    </div>
+  </form>
 </template>

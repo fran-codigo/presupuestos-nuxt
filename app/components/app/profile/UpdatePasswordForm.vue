@@ -4,17 +4,17 @@ const toast = useToast();
 
 const loading = ref(false);
 const formData = reactive({
-  current_password: '',
-  password: '',
-  password_confirmation: '',
+  current_password: "",
+  password: "",
+  password_confirmation: "",
 });
 
 const onSubmit = async () => {
   try {
     loading.value = true;
 
-    const res = await $fetch('/api/user/update-password', {
-      method: 'PUT',
+    const res = await $fetch("/api/user/update-password", {
+      method: "PUT",
       body: formData,
     });
 
@@ -22,11 +22,11 @@ const onSubmit = async () => {
       message: res.message,
     });
 
-    formData.current_password = '';
-    formData.password = '';
-    formData.password_confirmation = '';
+    formData.current_password = "";
+    formData.password = "";
+    formData.password_confirmation = "";
   } catch (error) {
-    handleErrors(toast, error, 'Hubo un error al cambiar tu contraseña');
+    handleErrors(toast, error, "Hubo un error al cambiar tu contraseña");
   } finally {
     loading.value = false;
   }
@@ -34,64 +34,74 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <form
-    @submit.prevent="onSubmit"
-    class="space-y-3"
-  >
-    <div class="space-y-3">
+  <form @submit.prevent="onSubmit" class="space-y-5">
+    <div class="space-y-2">
       <label
         for="current_password"
-        class="text-sm uppercase font-bold"
+        class="block text-sm font-semibold text-gray-300"
       >
         Contraseña Actual
       </label>
-      <input
+      <UInput
         id="current_password"
         v-model="formData.current_password"
         type="password"
-        placeholder="Tu contraseña actual"
-        class="w-full p-3 border border-gray-300 bg-gray-50 rounded focus:bg-white focus:border-blue-500 outline-none transition-all"
+        placeholder="••••••••"
+        size="lg"
+        color="primary"
+        variant="outline"
+        icon="i-heroicons-lock-closed"
+        class="block w-1/2"
       />
     </div>
 
-    <div class="space-y-3">
-      <label
-        for="password"
-        class="text-sm uppercase font-bold"
-      >
+    <div class="space-y-2">
+      <label for="password" class="block text-sm font-semibold text-gray-300">
         Nueva Contraseña
       </label>
-      <input
+      <UInput
         id="password"
         v-model="formData.password"
         type="password"
-        placeholder="Tu nueva contraseña"
-        class="w-full p-3 border border-gray-300 bg-gray-50 rounded focus:bg-white focus:border-blue-500 outline-none transition-all"
+        placeholder="••••••••"
+        size="lg"
+        color="primary"
+        variant="outline"
+        icon="i-heroicons-key"
+        class="block w-1/2"
       />
     </div>
 
-    <div class="space-y-3">
+    <div class="space-y-2">
       <label
         for="password_confirmation"
-        class="text-sm uppercase font-bold"
+        class="block text-sm font-semibold text-gray-300"
       >
         Confirmar Contraseña
       </label>
-      <input
+      <UInput
         id="password_confirmation"
         v-model="formData.password_confirmation"
         type="password"
-        placeholder="Confirma tu nueva contraseña"
-        class="w-full p-3 border border-gray-300 bg-gray-50 rounded focus:bg-white focus:border-blue-500 outline-none transition-all"
+        placeholder="••••••••"
+        size="lg"
+        color="primary"
+        variant="outline"
+        icon="i-heroicons-key"
+        class="block w-1/2"
       />
     </div>
 
-    <button
-      type="submit"
-      :disabled="loading"
-      class="bg-blue-600 w-full p-3 text-white uppercase font-bold hover:bg-blue-700 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded"
-    >
-      {{ loading ? 'Cambiando...' : 'Cambiar Contraseña' }}
-    </button>
+    <div class="pt-4 border-t border-gray-800">
+      <UButton
+        type="submit"
+        :loading="loading"
+        color="primary"
+        variant="solid"
+        size="xl"
+        class="w-full justify-center"
+        :label="loading ? 'Cambiando...' : 'Cambiar Contraseña'"
+      />
+    </div>
   </form>
 </template>

@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import { DialogTitle } from 'radix-vue';
-
 interface Props {
   closeModal: () => void;
 }
 
 const props = defineProps<Props>();
-const refreshBudget = inject<() => Promise<void>>('refreshBudget');
+const refreshBudget = inject<() => Promise<void>>("refreshBudget");
 
 const route = useRoute();
 const budgetId = route.params.id;
 const expenseId = computed(() => route.query.deleteExpenseId as string);
 
+const loading = ref(false);
+
 const onDelete = async () => {
   try {
+    loading.value = true;
     const res = await $fetch(
       `/api/budgets/${budgetId}/expenses/${expenseId.value}`,
       {
-        method: 'DELETE',
+        method: "DELETE",
       },
     );
 
@@ -31,39 +32,53 @@ const onDelete = async () => {
     props.closeModal();
   } catch (error) {
     const toast = useToast();
-    toast.error({ message: 'Hubo un error al eliminar el gasto' });
+    toast.error({ message: "Hubo un error al eliminar el gasto" });
+  } finally {
+    loading.value = false;
   }
 };
 </script>
 
 <template>
-  <div>
-    <DialogTitle as="h3" class="font-black text-4xl text-green-800 my-5">
-      Eliminar Gasto
-    </DialogTitle>
-    
-    <p class="text-xl font-bold">
-      Confirma para eliminar, 
-      <span class="text-blue-500">el gasto</span>
-    </p>
-    <p class="text-gray-600 text-sm">
-      (Un gasto eliminado no se puede recuperar)
-    </p>
-    
-    <div class="grid grid-cols-2 gap-5 mt-10">
-      <button
-        @click="props.closeModal"
-        class="bg-blue-500 w-full p-3 text-white uppercase font-bold hover:bg-blue-600 cursor-pointer transition-colors"
+  <div class="space-y-6">
+    <div class="text-center">
+      <div
+        class="inline-flex justify-center items-center w-16 h-16 rounded-full bg-red-500/10 mb-4 ring-2 ring-red-500/20"
       >
-        Cancelar
-      </button>
-      <button
+        <UIcon
+          name="i-heroicons-exclamation-triangle-20-solid"
+          class="w-8 h-8 text-red-500"
+        />
+      </div>
+      <h2 class="text-3xl font-black text-white tracking-tight mb-2">
+        Eliminar Gasto
+      </h2>
+      <p class="text-gray-400 font-medium max-w-sm mx-auto">
+        ¿Estás seguro de que deseas eliminar este gasto? Esta acción no se puede
+        deshacer.
+      </p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-800">
+      <UButton
         type="button"
+        color="neutral"
+        variant="soft"
+        size="xl"
+        class="flex-1 justify-center"
+        label="Cancelar"
+        @click="closeModal"
+      />
+      <UButton
+        type="button"
+        :loading="loading"
+        color="error"
+        variant="solid"
+        size="xl"
+        class="flex-1 justify-center"
+        :label="loading ? 'Eliminando...' : 'Sí, Eliminar'"
         @click="onDelete"
-        class="bg-red-500 w-full p-3 text-white uppercase font-bold hover:bg-red-600 cursor-pointer transition-colors"
-      >
-        Eliminar
-      </button>
+      />
     </div>
   </div>
 </template>

@@ -1,27 +1,40 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="">
-    <header class="bg-green-800 py-5">
+  <div
+    class="min-h-screen bg-gray-950 text-gray-200 font-sans selection:bg-primary-500/30"
+  >
+    <header
+      class="sticky top-0 z-50 bg-gray-950/80 backdrop-blur-md border-b border-gray-800"
+    >
       <div
-        class="max-w-5xl mx-auto flex flex-col gap-4 lg:flex-row items-center justify-center lg:justify-between"
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between"
       >
-        <div class="w-96 text-center lg:text-left">
-          <NuxtLink to="/app" class="text-white text-3xl font-bold">
-            Presupuestos
+        <div class="flex items-center gap-2">
+          <NuxtLink
+            to="/app"
+            class="text-white text-3xl font-black tracking-tight hover:text-primary-400 transition-colors"
+          >
+            Finio<span class="text-primary-500">.</span>
           </NuxtLink>
         </div>
 
         <AppMenu />
       </div>
     </header>
-    <section class="max-w-5xl mx-auto mt-10 p-3 py-10">
-      <slot />
-    </section>
 
-    <footer class="py-5">
-      <p class="text-center">
-        Todos los Derechos Reservados &copy; {{ new Date().getFullYear() }}
+    <main
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-[calc(100vh-160px)]"
+    >
+      <slot />
+    </main>
+
+    <footer
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-800"
+    >
+      <p class="text-center text-sm text-gray-500">
+        &copy; {{ new Date().getFullYear() }} Finio. Todos los derechos
+        reservados.
       </p>
     </footer>
   </div>

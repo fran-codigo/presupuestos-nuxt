@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { DialogTitle } from 'radix-vue';
 const { handleErrors } = useHandleErrors();
 const toast = useToast();
 const route = useRoute();
 const budgetId = route.params.id;
 const loading = ref(false);
 const formData = reactive({
-  name: '',
+  name: "",
   amount: 0,
 });
-const refreshBudget = inject<() => Promise<void>>('refreshBudget');
+const refreshBudget = inject<() => Promise<void>>("refreshBudget");
 
 interface Props {
   closeModal: () => void;
@@ -21,7 +20,7 @@ const onSubmit = async () => {
   try {
     loading.value = true;
     const res = await $fetch(`/api/budgets/${budgetId}/expenses`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
 
@@ -32,11 +31,11 @@ const onSubmit = async () => {
     if (res && res.message) {
       toast.success({ message: res.message });
     }
-    formData.name = '';
+    formData.name = "";
     formData.amount = 0;
     props.closeModal();
   } catch (error) {
-    handleErrors(toast, error, 'Hubo un error al agregar el gasto');
+    handleErrors(toast, error, "Hubo un error al agregar el gasto");
   } finally {
     loading.value = false;
   }
@@ -44,50 +43,65 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <div>
-    <DialogTitle class="text-2xl font-bold mb-4">Agregar Gasto</DialogTitle>
-    <p class="text-xl font-bold">
-      Llena el formulario y crea un
-      <span class="text-green-800">gasto</span>
-    </p>
-    <form
-      @submit.prevent="onSubmit"
-      noValidate
-      class="bg-gray-100 shadow-lg rounded-lg p-10 mt-10 border"
-    >
-      <div class="mb-5">
-        <label class="text-sm uppercase font-bold">Nombre</label>
-        <input
+  <div class="space-y-6">
+    <div>
+      <h2 class="text-3xl font-black text-white tracking-tight mb-2">
+        Agregar Gasto
+      </h2>
+      <p class="text-gray-400 font-medium">
+        Llena el formulario para registrar un nuevo
+        <span class="text-primary-400">gasto</span> en este presupuesto
+      </p>
+    </div>
+
+    <form @submit.prevent="onSubmit" novalidate class="space-y-6">
+      <div class="space-y-2">
+        <label class="text-sm font-semibold text-gray-300"
+          >Nombre del gasto</label
+        >
+        <UInput
           v-model="formData.name"
-          type="text"
-          class="w-full p-3 borderborder-gray-100 bg-white"
-          placeholder="Nombre del gasto"
+          placeholder="Ej. Cena con amigos"
+          size="lg"
+          color="primary"
+          variant="outline"
         />
       </div>
-      <div class="mb-5">
-        <label class="text-sm uppercase font-bold">Cantidad</label>
-        <input
+
+      <div class="space-y-2">
+        <label class="text-sm font-semibold text-gray-300">Cantidad</label>
+        <UInput
           v-model.number="formData.amount"
           type="number"
-          class="w-full p-3 borderborder-gray-100 bg-white"
-          placeholder="Cantidad"
+          placeholder="0"
+          size="lg"
+          color="primary"
+          icon="i-heroicons-currency-dollar"
+          variant="outline"
         />
       </div>
-      <div class="flex flex-col gap-2">
-        <button
-          type="submit"
-          :disabled="loading"
-          class="bg-blue-500 text-white px-4 py-3 rounded hover:bg-blue-600"
-        >
-          {{ loading ? 'Agregando...' : 'Agregar Gasto' }}
-        </button>
-        <button
+
+      <div
+        class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-800"
+      >
+        <UButton
           type="button"
+          color="neutral"
+          variant="soft"
+          size="xl"
+          class="flex-1 justify-center"
+          label="Cancelar"
           @click="closeModal"
-          class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-        >
-          Cancelar
-        </button>
+        />
+        <UButton
+          type="submit"
+          :loading="loading"
+          color="primary"
+          variant="solid"
+          size="xl"
+          class="flex-1 justify-center"
+          :label="loading ? 'Agregando...' : 'Agregar Gasto'"
+        />
       </div>
     </form>
   </div>

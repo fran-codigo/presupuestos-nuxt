@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { DialogTitle } from 'radix-vue';
+import { ref } from "vue";
 const { handleErrors } = useHandleErrors();
 const toast = useToast();
 const route = useRoute();
@@ -13,23 +12,25 @@ interface Props {
   closeModal: () => void;
 }
 const props = defineProps<Props>();
-const refreshBudgets = inject<() => Promise<void>>('refreshBudgets');
-const password = ref('');
+const refreshBudgets = inject<() => Promise<void>>("refreshBudgets");
+const password = ref("");
+const loading = ref(false);
 
 const onSubmit = async () => {
   try {
-    const checkPassword = await $fetch('/api/user/check-password', {
-      method: 'POST',
+    loading.value = true;
+    const checkPassword = await $fetch("/api/user/check-password", {
+      method: "POST",
       body: { password: password.value },
     });
 
     if (!checkPassword.success) {
-      toast.error({ message: 'Contraseña incorrecta' });
+      toast.error({ message: "Contraseña incorrecta" });
       return;
     }
 
     const res = await $fetch(`/api/budgets/${budgetId.value}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
 
     if (refreshBudgets) await refreshBudgets();
@@ -39,57 +40,72 @@ const onSubmit = async () => {
     }
     props.closeModal();
   } catch (error) {
-    handleErrors(toast, error, 'Hubo un error al eliminar el presupuesto');
+    handleErrors(toast, error, "Hubo un error al eliminar el presupuesto");
+  } finally {
+    loading.value = false;
   }
 };
 </script>
 
 <template>
-  <div>
-    <div class="relative bg-white rounded-lg shadow-lg w-full p-6 z-10">
-      <DialogTitle
-        as="h3"
-        class="font-black text-4xl text-green-800 my-5"
+  <div class="space-y-6">
+    <div class="text-center">
+      <div
+        class="inline-flex justify-center items-center w-16 h-16 rounded-full bg-red-500/10 mb-4 ring-2 ring-red-500/20"
       >
-        Eliminar Presupuesto
-      </DialogTitle>
-
-      <p class="text-xl font-bold">
-        Confirma para eliminar,
-        <span class="text-blue-500"> el presupuesto</span>
-      </p>
-      <p class="text-gray-600 text-sm">
-        (Un presupuesto eliminado no se puede recuperar)
-      </p>
-
-      <div class="space-y-4 mt-6">
-        <div>
-          <label class="block text-sm font-medium mb-1">Contraseña</label>
-          <input
-            v-model="password"
-            type="password"
-            class="w-full p-3 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-red-200"
-            placeholder="Tu contraseña"
-          />
-        </div>
-
-        <div class="grid grid-cols-2 gap-5 mt-6">
-          <button
-            @click="props.closeModal"
-            class="bg-blue-500 w-full p-3 text-white uppercase font-bold hover:bg-blue-600 cursor-pointer transition-colors"
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="button"
-            @click="onSubmit"
-            class="bg-red-500 w-full p-3 text-white uppercase font-bold hover:bg-red-600 cursor-pointer transition-colors"
-          >
-            Eliminar
-          </button>
-        </div>
+        <UIcon
+          name="i-heroicons-exclamation-triangle-20-solid"
+          class="w-8 h-8 text-red-500"
+        />
       </div>
+      <h2 class="text-3xl font-black text-white tracking-tight mb-2">
+        Eliminar Presupuesto
+      </h2>
+      <p class="text-gray-400 font-medium max-w-sm mx-auto">
+        ¿Estás seguro de que deseas eliminar este presupuesto por completo? Esta
+        acción es <strong class="text-red-400">permanente</strong>.
+      </p>
     </div>
+
+    <form
+      @submit.prevent="onSubmit"
+      class="space-y-6 pt-4 border-t border-gray-800"
+    >
+      <div class="space-y-2 text-left">
+        <label class="block text-sm font-semibold text-gray-300"
+          >Confirma con tu contraseña</label
+        >
+        <UInput
+          v-model="password"
+          type="password"
+          size="lg"
+          placeholder="••••••••"
+          color="primary"
+          variant="outline"
+          icon="i-heroicons-lock-closed-20-solid"
+        />
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <UButton
+          type="button"
+          color="neutral"
+          variant="soft"
+          size="xl"
+          class="flex-1 justify-center"
+          label="Cancelar"
+          @click="closeModal"
+        />
+        <UButton
+          type="submit"
+          :loading="loading"
+          color="error"
+          variant="solid"
+          size="xl"
+          class="flex-1 justify-center"
+          :label="loading ? 'Eliminando...' : 'Sí, Eliminar'"
+        />
+      </div>
+    </form>
   </div>
 </template>

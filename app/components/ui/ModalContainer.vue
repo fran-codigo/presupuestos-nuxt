@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import {
-  DialogTitle,
-  DialogRoot,
-  DialogPortal,
-  DialogOverlay,
-  DialogContent,
-  DialogClose,
-} from 'radix-vue';
-import AddExpenseForm from '../app/expenses/AddExpenseForm.vue';
-import EditExpenseForm from '../app/expenses/EditExpenseForm.vue';
-import DeleteExpenseForm from '../app/expenses/DeleteExpenseForm.vue';
-import DeleteBudgetModal from '../app/budgets/DeleteBudgetModal.vue';
+import { computed, ref, watch } from "vue";
+import AddExpenseForm from "../app/expenses/AddExpenseForm.vue";
+import EditExpenseForm from "../app/expenses/EditExpenseForm.vue";
+import DeleteExpenseForm from "../app/expenses/DeleteExpenseForm.vue";
+import DeleteBudgetModal from "../app/budgets/DeleteBudgetModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -24,20 +17,36 @@ const componentsMap = {
 } as const;
 
 // Determinar si el modal debe mostrarse
-const show = computed(() => route.query.showModal === 'true');
+const show = computed({
+  get: () => route.query.showModal === "true",
+  set: (val) => {
+    if (!val) closeModal();
+  },
+});
 
-// Determinar qué componente renderizar
+// Determinar qué componente renderizar basado en la ruta
 const getComponentName = () => {
-  if (route.query.addExpense) return 'AddExpense';
-  if (route.query.editExpenseId) return 'EditExpense';
-  if (route.query.deleteExpenseId) return 'DeleteExpense';
-  if (route.query.deleteBudget) return 'DeleteBudget';
+  if (route.query.addExpense) return "AddExpense";
+  if (route.query.editExpenseId) return "EditExpense";
+  if (route.query.deleteExpenseId) return "DeleteExpense";
+  if (route.query.deleteBudget) return "DeleteBudget";
   return null;
 };
 
-const componentName = computed(() => getComponentName());
+// Mantener el componente activo para la animación de salida
+const activeComponent = ref(getComponentName());
+watch(
+  () => route.query.showModal,
+  (val) => {
+    if (val === "true") {
+      activeComponent.value = getComponentName();
+    }
+  },
+  { immediate: true },
+);
+
 const ComponentToRender = computed(() => {
-  const name = componentName.value;
+  const name = activeComponent.value;
   return name ? componentsMap[name] : null;
 });
 
@@ -60,28 +69,15 @@ const closeModal = () => {
 </script>
 
 <template>
-  <DialogRoot
-    :open="show"
-    @update:open="(value) => !value && closeModal()"
-  >
-    <DialogPortal>
-      <!-- Overlay/Backdrop -->
-      <DialogOverlay
-        class="fixed inset-0 bg-black/60 z-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-      />
-
-      <!-- Contenido del modal -->
-      <DialogContent
-        class="fixed left-[50%] top-[50%] z-50 w-full max-w-5xl translate-x-[-50%] translate-y-[-50%] rounded-2xl bg-white p-16 shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]"
-      >
-        <DialogTitle class="text-3xl font-bold mb-6">
-        </DialogTitle>
+  <UModal v-model:open="show">
+    <template #content>
+      <UCard>
         <component
           v-if="ComponentToRender"
           :is="ComponentToRender"
           :close-modal="closeModal"
         />
-      </DialogContent>
-    </DialogPortal>
-  </DialogRoot>
+      </UCard>
+    </template>
+  </UModal>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { DialogTitle } from 'radix-vue';
+import { ref, reactive, computed, inject, watch } from "vue";
+
 const { handleErrors } = useHandleErrors();
 
 interface Props {
@@ -12,21 +13,33 @@ const route = useRoute();
 const budgetId = route.params.id;
 const expenseId = computed(() => route.query.editExpenseId as string);
 const loading = ref(false);
-const refreshBudget = inject<() => Promise<void>>('refreshBudget');
+const refreshBudget = inject<() => Promise<void>>("refreshBudget");
 
-const { data: expense } = await useFetch(
+const formData = reactive({
+  name: "",
+  amount: 0,
+});
+
+const { data: expense, pending } = useFetch<any>(
   `/api/budgets/${budgetId}/expenses/${expenseId.value}`,
   {
+    lazy: true,
     onResponseError() {
       props.closeModal();
     },
   },
 );
 
-const formData = reactive({
-  name: expense.value?.name || '',
-  amount: expense.value?.amount || 0,
-});
+watch(
+  expense,
+  (newVal) => {
+    if (newVal) {
+      formData.name = newVal.name;
+      formData.amount = newVal.amount;
+    }
+  },
+  { immediate: true },
+);
 
 const onSubmit = async () => {
   try {
@@ -34,7 +47,7 @@ const onSubmit = async () => {
     const res = await $fetch(
       `/api/budgets/${budgetId}/expenses/${expenseId.value}`,
       {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       },
     );
@@ -50,7 +63,7 @@ const onSubmit = async () => {
     props.closeModal();
   } catch (error) {
     props.closeModal();
-    handleErrors(toast, error, 'Hubo un error al actualizar el gasto');
+    handleErrors(toast, error, "Hubo un error al actualizar el gasto");
   } finally {
     loading.value = false;
   }
@@ -58,43 +71,75 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <div>
-    <DialogTitle class="text-2xl font-bold mb-4">Actualizar Gasto</DialogTitle>
-    <form
-      @submit.prevent="onSubmit"
-      class="space-y-4"
+  <div class="space-y-6 relative min-h-[300px]">
+    <!-- Loading Overlay -->
+    <div
+      v-if="pending"
+      class="absolute inset-0 z-10 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center rounded-xl"
     >
-      <div>
-        <label class="block text-sm font-bold mb-2">Nombre</label>
-        <input
+      <UIcon
+        name="i-heroicons-arrow-path-20-solid"
+        class="w-10 h-10 text-primary-500 animate-spin"
+      />
+    </div>
+
+    <div>
+      <h2 class="text-3xl font-black text-white tracking-tight mb-2">
+        Actualizar Gasto
+      </h2>
+      <p class="text-gray-400 font-medium">
+        Modifica los detalles de este gasto
+      </p>
+    </div>
+
+    <form @submit.prevent="onSubmit" class="space-y-6">
+      <div class="space-y-2">
+        <label class="text-sm font-semibold text-gray-300"
+          >Nombre del gasto</label
+        >
+        <UInput
           v-model="formData.name"
-          type="text"
-          class="w-full p-3 border border-gray-200 rounded"
+          placeholder="Nombre del gasto"
+          size="lg"
+          color="primary"
+          variant="outline"
         />
       </div>
-      <div>
-        <label class="block text-sm font-bold mb-2">Cantidad</label>
-        <input
+
+      <div class="space-y-2">
+        <label class="text-sm font-semibold text-gray-300">Cantidad</label>
+        <UInput
           v-model.number="formData.amount"
           type="number"
-          class="w-full p-3 border border-gray-200 rounded"
+          placeholder="0"
+          size="lg"
+          color="primary"
+          icon="i-heroicons-currency-dollar"
+          variant="outline"
         />
       </div>
-      <div class="flex flex-col gap-2">
-        <button
-          type="submit"
-          :disabled="loading"
-          class="bg-blue-500 text-white px-4 py-3 rounded hover:bg-blue-600"
-        >
-          {{ loading ? 'Actualizando...' : 'Actualizar Gasto' }}
-        </button>
-        <button
+
+      <div
+        class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-800"
+      >
+        <UButton
           type="button"
+          color="neutral"
+          variant="soft"
+          size="xl"
+          class="flex-1 justify-center"
+          label="Cancelar"
           @click="closeModal"
-          class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-        >
-          Cancelar
-        </button>
+        />
+        <UButton
+          type="submit"
+          :loading="loading"
+          color="primary"
+          variant="solid"
+          size="xl"
+          class="flex-1 justify-center"
+          :label="loading ? 'Actualizando...' : 'Actualizar Gasto'"
+        />
       </div>
     </form>
   </div>
