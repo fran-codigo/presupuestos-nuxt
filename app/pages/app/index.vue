@@ -28,7 +28,7 @@ const { user } = useUserSession();
     </div>
 
     <!-- Acciones Rápidas -->
-    <div class="grid gap-6 grid-cols-1 md:grid-cols-2 auto-rows-max">
+    <div class="grid gap-6 grid-cols-1 md:grid-cols-3 auto-rows-max">
       <NuxtLink to="/app/presupuestos" class="group h-full block">
         <UCard
           class="h-full cursor-pointer hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-l-4 border-l-primary-500/80 hover:border-l-primary-400 flex flex-col justify-center p-4"
