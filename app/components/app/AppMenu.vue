@@ -31,6 +31,11 @@ const items = computed(() => [
       to: "/app/notas",
       icon: "i-heroicons-document-text-20-solid",
     },
+    {
+      label: "Mis Ideas",
+      to: "/app/ideas",
+      icon: "i-heroicons-light-bulb-20-solid",
+    }
   ],
   [
     {

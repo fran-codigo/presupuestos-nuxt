@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useNote } from "~/composables/useNote";
+import { useNote } from '~/composables/useNote';
 
 const { handleErrors } = useHandleErrors();
 const route = useRoute();
@@ -9,16 +9,16 @@ const { data: note, pending } = await useFetch(`/api/notes/${route.params.id}`);
 const { updateNote } = useNote();
 
 const formData = reactive({
-  title: note.value?.title || "",
-  description: note.value?.description || "",
-  status: note.value?.status || "active",
+  title: note.value?.title || '',
+  description: note.value?.description || '',
+  status: note.value?.status || 'active',
 });
 
 const loading = ref(false);
 
 const statusOptions = [
-  { value: "active", label: "Activa" },
-  { value: "archived", label: "Archivada" },
+  { value: 'active', label: 'Activa' },
+  { value: 'archived', label: 'Archivada' },
 ];
 
 const onSubmit = async () => {
@@ -29,7 +29,7 @@ const onSubmit = async () => {
     toast.success({ message: res.message });
     await navigateTo(`/app/notas/`);
   } catch (error) {
-    handleErrors(toast, error, "Hubo un error al actualizar la nota");
+    handleErrors(toast, error, 'Hubo un error al actualizar la nota');
   } finally {
     loading.value = false;
   }
@@ -43,14 +43,20 @@ const onCancel = async () => {
 <template>
   <div class="space-y-6">
     <!-- Loading State -->
-    <div v-if="pending" class="space-y-4">
+    <div
+      v-if="pending"
+      class="space-y-4"
+    >
       <USkeleton class="h-12 w-3/4" />
       <USkeleton class="h-96" />
       <USkeleton class="h-10 w-1/4" />
     </div>
 
     <!-- Edit Form -->
-    <div v-else-if="note" class="space-y-6">
+    <div
+      v-else-if="note"
+      class="space-y-6"
+    >
       <!-- Header -->
       <div
         class="flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-4"
@@ -63,7 +69,7 @@ const onCancel = async () => {
           </p>
         </div>
 
-        <NuxtLink :to="`/app/notas/${route.params.id}`">
+        <NuxtLink to="/app/notas">
           <UButton
             color="neutral"
             variant="ghost"
@@ -75,10 +81,17 @@ const onCancel = async () => {
 
       <!-- Form Card -->
       <UCard class="max-w-2xl">
-        <UForm :state="formData" @submit="onSubmit" class="space-y-6">
+        <UForm
+          :state="formData"
+          @submit="onSubmit"
+          class="space-y-6"
+        >
           <!-- Title Field -->
           <div class="space-y-2">
-            <UFormField label="Título" name="title">
+            <UFormField
+              label="Título"
+              name="title"
+            >
               <UInput
                 v-model="formData.title"
                 placeholder="Título de la nota"
@@ -95,7 +108,11 @@ const onCancel = async () => {
 
           <!-- Description Field -->
           <div class="space-y-2">
-            <UFormField label="Descripción" name="description" hint="Opcional">
+            <UFormField
+              label="Descripción"
+              name="description"
+              hint="Opcional"
+            >
               <UTextarea
                 v-model="formData.description"
                 placeholder="Escribe el contenido de tu nota..."
@@ -111,7 +128,10 @@ const onCancel = async () => {
 
           <!-- Status Field -->
           <div class="space-y-2">
-            <UFormField label="Estado" name="status">
+            <UFormField
+              label="Estado"
+              name="status"
+            >
               <USelect
                 v-model="formData.status"
                 :items="statusOptions"
@@ -144,7 +164,10 @@ const onCancel = async () => {
     </div>
 
     <!-- Error State -->
-    <div v-else class="text-center py-12">
+    <div
+      v-else
+      class="text-center py-12"
+    >
       <UIcon
         name="i-heroicons-exclamation-triangle-20-solid"
         class="w-12 h-12 mx-auto text-red-400 mb-4"
